@@ -1,6 +1,13 @@
 <?php
 session_start();
+
 require_once('../../../services/AdminService.php');
+
+// Redirect to login if not logged in
+if (!isset($_SESSION['username'])) {
+    header("Location: ../../../index.php");
+    exit();
+}
 
 // Instantiate the class
 $adminService = new AdminServices();
@@ -20,12 +27,24 @@ if (isset($_GET['lat']) && isset($_GET['long'])) {
 
     //Check if There is a POST METHOD
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $title != "LocationIncident") {
-        // Check if the required POST data exists before accessing it
-        $patient_name = isset($_POST['patient_name']) ? $_POST['patient_name'] : null;
-        $patient_age = isset($_POST['patient_age']) ? $_POST['patient_age'] : null;
-        $patient_sex = isset($_POST['patient_sex']) ? $_POST['patient_sex'] : null;
-        $patient_address = isset($_POST['patient_address']) ? $_POST['patient_address'] : null;
-        $statusID_fk = isset($_POST['statusID']) ? $_POST['statusID'] : null;
+
+        $patients = [];
+
+        if (isset($_POST['patient_name'], $_POST['patient_age'], $_POST['patient_sex'], $_POST['patient_address'], $_POST['statusID'])) {
+            // Iterate over the number of patients based on one of the fields (assuming they are all the same length)
+            for ($i = 0; $i < count($_POST['patient_name']); $i++) {
+                $patients[] = [
+                    'patientID' => $_POST['patientID'][$i],
+                    'patient_name' => $_POST['patient_name'][$i],
+                    'patient_age' => $_POST['patient_age'][$i],
+                    'patient_sex' => $_POST['patient_sex'][$i],
+                    'patient_address' => $_POST['patient_address'][$i],
+                    'statusID' => $_POST['statusID'][$i]
+                ];
+            }
+        }
+
+        
         $complaint = isset($_POST['complaint']) ? $_POST['complaint'] : null;
         $rescuer_team = isset($_POST['rescuer_team']) ? $_POST['rescuer_team'] : null;
         $referred_hospital = isset($_POST['referred_hospital']) ? $_POST['referred_hospital'] : null;
@@ -50,11 +69,7 @@ if (isset($_GET['lat']) && isset($_GET['long'])) {
             $status = $adminService->createIncident(
                 $latitude,
                 $longitude,
-                $patient_name,
-                $patient_age,
-                $patient_sex,
-                $patient_address,
-                $statusID_fk,
+                $patients,
                 $complaint,
                 $rescuer_team,
                 $referred_hospital,
@@ -78,23 +93,17 @@ if (isset($_GET['lat']) && isset($_GET['long'])) {
             }
         // else if the POST Data is for Update this Run Thie need a Incident 
         }else if( $_POST['action'] == 'updateIncident'){
-            if(isset($_POST['patiendID']) && isset($_POST['incidentID_fk'])){
-                $patientID = $_POST['patiendID'];
+            if(isset($_POST['incidentID_fk'])){
                 $incidentID_fk = $_POST['incidentID_fk'];
             }else{
                 header("Location: update.php??PatientID=$patientID&locID=$locID&lat=$lat&long=$long");
                 exit();
             }
             $status = $adminService->updateIncident( 
-                $patientID,
                 $incidentID_fk,
                 $latitude, 
                 $longitude, 
-                $patient_name, 
-                $patient_age, 
-                $patient_sex, 
-                $patient_address, 
-                $statusID_fk, 
+                $patients,
                 $complaint, 
                 $rescuer_team, 
                 $referred_hospital, 

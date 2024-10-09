@@ -17,20 +17,22 @@ class AdminServices extends config {
         }
     }
 
-    public function getAllIncidentById($LocID) {
+    public function getAllIncidentByLocId($LocID) {
         try {
             $query = "SELECT 
                         tbl_incident.id AS incident_id,
                         tbl_incident.incidentID_fk,
-                        tbl_incident.patientID_fk,
                         tbl_incident.complaint,
                         tbl_incident.rescuer_team,
                         tbl_incident.referred_hospital,
                         tbl_incident.incident_date,
+    
                         tbl_patient_info.patient_name,
                         tbl_patient_info.patient_age,
                         tbl_patient_info.patient_sex,
                         tbl_patient_info.patient_address,
+                        tbl_patient_info.statusID,
+    
                         tbl_incident_location.latitude,
                         tbl_incident_location.longitude,
                         tbl_patient_status.color AS patient_status_color,
@@ -63,13 +65,13 @@ class AdminServices extends config {
                     FROM tbl_incident
     
                     LEFT JOIN tbl_patient_info 
-                        ON tbl_incident.patientID_fk = tbl_patient_info.patientID
+                        ON tbl_incident.incidentID_fk = tbl_patient_info.incidentID_fk
     
                     LEFT JOIN tbl_incident_location 
                         ON tbl_incident.locationID_fk = tbl_incident_location.locationID
     
                     LEFT JOIN tbl_patient_status 
-                        ON tbl_incident.statusID_fk = tbl_patient_status.statusID
+                        ON tbl_patient_info.statusID = tbl_patient_status.statusID
     
                     LEFT JOIN tbl_type_incident 
                         ON tbl_incident.incidentID_fk = tbl_type_incident.incidentID
@@ -79,38 +81,73 @@ class AdminServices extends config {
                         AND tbl_type_incident.isVehiclular = 1
     
                     WHERE tbl_incident_location.locationID = :LocID
-                    
+    
                     ORDER BY tbl_incident.incident_date DESC";
     
-            $stmt = $this->pdo->prepare($query); // Prepare the query
-            $stmt->bindParam(':LocID', $LocID);  // Bind the value
-            $stmt->execute(); // Execute the query
-            return $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch the result
+            $stmt = $this->pdo->prepare($query);
+            $stmt->bindParam(':LocID', $LocID);
+            $stmt->execute();
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+            // Grouping patient info by incident
+            $incidents = [];
+            foreach ($results as $row) {
+                $incidentID = $row['incident_id'];
+                if (!isset($incidents[$incidentID])) {
+                    // Initialize incident information
+                    $incidents[$incidentID] = [
+                        'incident_id' => $row['incident_id'],
+                        'incidentID_fk' => $row['incidentID_fk'],
+                        'complaint' => $row['complaint'],
+                        'rescuer_team' => $row['rescuer_team'],
+                        'referred_hospital' => $row['referred_hospital'],
+                        'incident_date' => $row['incident_date'],
+                        'latitude' => $row['latitude'],
+                        'longitude' => $row['longitude'],
+                        'type_of_incident' => $row['type_of_incident'],
+                        'incident_description' => $row['incident_description'],
+                        'isVehiclular' => $row['isVehiclular'],
+                        'patient_classification' => $row['patient_classification'],
+                        'vehicle_type' => $row['vehicle_type'],
+                        'intoxication' => $row['intoxication'],
+                        'helmet' => $row['helmet'],
+                        'stray' => $row['stray'],
+                        'patients' => [] // Initialize patients array
+                    ];
+                }
+    
+                // Add patient info to the patients array
+                $incidents[$incidentID]['patients'][] = [
+                    'patient_name' => $row['patient_name'],
+                    'patient_age' => $row['patient_age'],
+                    'patient_sex' => $row['patient_sex'],
+                    'patient_address' => $row['patient_address'],
+                    'statusID' => $row['statusID'],
+                    'patient_status_color' => $row['patient_status_color'],
+                    'patient_status_description' => $row['patient_status_description'],
+                ];
+            }
+    
+            return $incidents; // Return grouped incidents with patients
         }
         catch (PDOException $e) {
             echo "Error: " . $e->getMessage();
         }
     }
     
-    public function getPatientIncidentById($patientID) {
+    
+    public function getIncidentById($incidentID) {
         try {
             $query = "SELECT 
-                            pi.patientID,
-                            pi.patient_name,
-                            pi.patient_age,
-                            pi.patient_sex,
-                            pi.patient_address,
-                            
                             i.incidentID_fk,
                             i.complaint,
                             i.rescuer_team,
                             i.referred_hospital,
                             i.incident_date,
-                            i.statusID_fk,
-
+    
                             il.latitude,
                             il.longitude,
-
+    
                             ti.isVehiclular,
                             ti.type_of_incident,
                             ti.description,
@@ -120,38 +157,48 @@ class AdminServices extends config {
                             vi.intoxication,
                             vi.helmet,
                             vi.stray
-
                         FROM tbl_patient_info pi
-
                         -- Join with incident table
-                        INNER JOIN tbl_incident i ON pi.patientID = i.patientID_fk
-
+                        INNER JOIN tbl_incident i ON pi.incidentID_fk = i.incidentID_fk
                         -- Join with incident location table
                         INNER JOIN tbl_incident_location il ON i.locationID_fk = il.locationID
-
                         -- Join with type of incident table
                         LEFT JOIN tbl_type_incident ti ON i.incidentID_fk = ti.incidentID
-
                         -- Left join with vehicular incident table (optional if vehicular)
                         LEFT JOIN tbl_vehicular_incident vi ON i.incidentID_fk = vi.incidentID
 
-                        WHERE pi.patientID = :patientID";
+                        WHERE pi.incidentID_fk = :incidentID";
     
             $stmt = $this->pdo->prepare($query); // Prepare the query
-            $stmt->bindParam(':patientID', $patientID);  // Bind the value
+            $stmt->bindParam(':incidentID', $incidentID);  // Bind the value
             $stmt->execute(); // Execute the query
-            return $stmt->fetch(PDO::FETCH_ASSOC); // Fetch the result
-        }
-        catch (PDOException $e) {
+            
+            $results = $stmt->fetch(PDO::FETCH_ASSOC); // Fetch all results
+            return $results; // Return all matching records
+    
+        } catch (PDOException $e) {
             echo "Error: " . $e->getMessage();
+            return []; // Return an empty array on error
         }
     }
 
+        
+    public function getIncidentPatientsById($incidentID) {
+        try {
+            $query = "SELECT `id`, `incidentID_fk`, `patientID`, `statusID`, `patient_name`, `patient_age`, `patient_sex`, `patient_address` FROM `tbl_patient_info` WHERE incidentID_fk = :incidentID";
     
-
+            $stmt = $this->pdo->prepare($query); // Prepare the query
+            $stmt->bindParam(':incidentID', $incidentID);  // Bind the value
+            $stmt->execute(); // Execute the query
+            
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all results
+            return $results; // Return all matching records
     
-
-
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            return []; // Return an empty array on error
+        }
+    }
 
     function generatePatientID() {
         // Prefix (optional) for the patient ID (e.g., "patient-")
@@ -241,11 +288,7 @@ class AdminServices extends config {
     public function createIncident( 
         $latitude, 
         $longitude, 
-        $patient_name, 
-        $patient_age, 
-        $patient_sex, 
-        $patient_address, 
-        $statusID_fk, 
+        $patients, //array patient info
         $complaint, 
         $rescuer_team, 
         $referred_hospital, 
@@ -276,28 +319,13 @@ class AdminServices extends config {
                 $stmt1->bindParam(':longitude', $longitude);
                 $stmt1->execute();
             }
+
             $incidentID = $this->generateIncidentID();
 
-            
-           
-
-            $tbl_patient_info_query = "INSERT INTO `tbl_patient_info`(`patientID`, `patient_name`, `patient_age`, `patient_sex`, `patient_address`) VALUES (:patientID, :patient_name, :patient_age, :patient_sex, :patient_address)";
-            $stmt2 = $this->pdo->prepare($tbl_patient_info_query);
-            $stmt2->bindParam(':patientID', $patientID);
-            $stmt2->bindParam(':patient_name', $patient_name);
-            $stmt2->bindParam(':patient_age', $patient_age);
-            $stmt2->bindParam(':patient_sex', $patient_sex);
-            $stmt2->bindParam(':patient_address', $patient_address);
-            // Execute the fourth query
-            $stmt2->execute();
-
-
-            $incident_query = "INSERT INTO `tbl_incident`(`patientID_fk`, `locationID_fk`, `statusID_fk`, `incidentID_fk`, `complaint`, `rescuer_team`, `referred_hospital`, `incident_date`) VALUES (:patientID_fk, :locationID_fk, :statusID_fk , :incidentID_fk, :complaint, :rescuer_team, :referred_hospital, :incident_date)";
+            $incident_query = "INSERT INTO `tbl_incident`(`locationID_fk`, `incidentID_fk`, `complaint`, `rescuer_team`, `referred_hospital`, `incident_date`) VALUES (:locationID_fk, :incidentID_fk, :complaint, :rescuer_team, :referred_hospital, :incident_date)";
 
             $stmt3 = $this->pdo->prepare($incident_query);
-            $stmt3->bindParam(':patientID_fk', $patientID);
             $stmt3->bindParam(':locationID_fk', $locationID);
-            $stmt3->bindParam(':statusID_fk',  $statusID_fk);
             $stmt3->bindParam(':incidentID_fk', $incidentID);
             $stmt3->bindParam(':complaint', $complaint);
             $stmt3->bindParam(':rescuer_team', $rescuer_team);
@@ -306,6 +334,24 @@ class AdminServices extends config {
 
             // Execute the fourth query
             $stmt3->execute();
+
+
+                        //INSERT HERE ALL THE Patient
+            // Insert each patient data
+            foreach ($patients as $patient) {
+                $patientID = $this->generatePatientID();  // Generate unique patientID for each patient
+                // Insert patient info
+                $tbl_patient_info_query = "INSERT INTO `tbl_patient_info`(`incidentID_fk`, `patientID`, `statusID`, `patient_name`, `patient_age`, `patient_sex`, `patient_address`) VALUES (:incidentID_fk, :patientID, :statusID, :patient_name, :patient_age, :patient_sex, :patient_address)";
+                $stmt2 = $this->pdo->prepare($tbl_patient_info_query);
+                $stmt2->bindParam(':incidentID_fk', $incidentID);
+                $stmt2->bindParam(':patientID', $patientID);
+                $stmt2->bindParam(':statusID', $patient['statusID']);
+                $stmt2->bindParam(':patient_name', $patient['patient_name']);
+                $stmt2->bindParam(':patient_age', $patient['patient_age']);
+                $stmt2->bindParam(':patient_sex', $patient['patient_sex']);
+                $stmt2->bindParam(':patient_address', $patient['patient_address']);
+                $stmt2->execute();
+            }
 
             $type_of_incident_query = "INSERT INTO `tbl_type_incident`(`incidentID`, `isVehiclular`, `type_of_incident`, `description`) VALUES (:incidentID,:isVehiclular ,:type_of_incident, :description)";
             $stmt4 = $this->pdo->prepare($type_of_incident_query);
@@ -344,15 +390,10 @@ class AdminServices extends config {
 
     // UPDATE INCIDENT
     public function updateIncident( 
-        $patientID,
         $incidentID_fk,
         $latitude, 
         $longitude, 
-        $patient_name, 
-        $patient_age, 
-        $patient_sex, 
-        $patient_address, 
-        $statusID_fk, 
+        $patients,
         $complaint, 
         $rescuer_team, 
         $referred_hospital, 
@@ -384,26 +425,32 @@ class AdminServices extends config {
                 $stmt1->execute();
             }
 
-            // Update patient info
-            $update_patient_info_query = "UPDATE `tbl_patient_info` SET `patient_name` = :patient_name, `patient_age` = :patient_age, `patient_sex` = :patient_sex, `patient_address` = :patient_address WHERE `patientID` = :patientID";
-            $stmt2 = $this->pdo->prepare($update_patient_info_query);
-            $stmt2->bindParam(':patient_name', $patient_name);
-            $stmt2->bindParam(':patient_age', $patient_age);
-            $stmt2->bindParam(':patient_sex', $patient_sex);    
-            $stmt2->bindParam(':patient_address', $patient_address);
-            $stmt2->bindParam(':patientID', $patientID);
-            $stmt2->execute();
+             // Insert each patient data
+             foreach ($patients as $patient) {
+                // Update patient info
+                $update_patient_info_query = "UPDATE `tbl_patient_info` SET `statusID` = :statusID, `patient_name` = :patient_name, `patient_age` = :patient_age, `patient_sex` = :patient_sex, `patient_address` = :patient_address WHERE `patientID` = :patientID";
+                $stmt2 = $this->pdo->prepare($update_patient_info_query);
+                
+                $stmt2->bindParam(':statusID', $patient['statusID']);
+                $stmt2->bindParam(':patient_name', $patient['patient_name']);
+                $stmt2->bindParam(':patient_age', $patient['patient_age']);
+                $stmt2->bindParam(':patient_sex', $patient['patient_sex']);
+                $stmt2->bindParam(':patient_address', $patient['patient_address']);
+                $stmt2->bindParam(':patientID', $patient['patientID']);
+                $stmt2->execute();
+            }
+
+
 
             // Update incident
-            $update_incident_query = "UPDATE `tbl_incident` SET `locationID_fk` = :locationID_fk, `statusID_fk` = :statusID_fk, `complaint` = :complaint, `rescuer_team` = :rescuer_team, `referred_hospital` = :referred_hospital, `incident_date` = :incident_date WHERE `patientID_fk` = :patientID";
+            $update_incident_query = "UPDATE `tbl_incident` SET `locationID_fk` = :locationID_fk, `complaint` = :complaint, `rescuer_team` = :rescuer_team, `referred_hospital` = :referred_hospital, `incident_date` = :incident_date WHERE `incidentID_fk` = :incidentID_fk";
             $stmt3 = $this->pdo->prepare($update_incident_query);
             $stmt3->bindParam(':locationID_fk', $locationID);
-            $stmt3->bindParam(':statusID_fk', $statusID_fk);
             $stmt3->bindParam(':complaint', $complaint);
             $stmt3->bindParam(':rescuer_team', $rescuer_team);
             $stmt3->bindParam(':referred_hospital', $referred_hospital);
             $stmt3->bindParam(':incident_date', $incident_date);
-            $stmt3->bindParam(':patientID', $patientID);
+            $stmt3->bindParam(':incidentID_fk', $incidentID_fk);
             $stmt3->execute();
 
 
@@ -484,6 +531,7 @@ class AdminServices extends config {
                     tbl_patient_info.patient_age,
                     tbl_patient_info.patient_sex,
                     tbl_patient_info.patient_address,
+                    tbl_patient_info.statusID,
                     tbl_incident_location.latitude,
                     tbl_incident_location.longitude,
                     tbl_patient_status.color AS patient_status_color,
@@ -526,7 +574,7 @@ class AdminServices extends config {
     
                 -- Join patient status table
                 LEFT JOIN tbl_patient_status 
-                    ON tbl_incident.statusID_fk = tbl_patient_status.statusID
+                    ON tbl_patient_info.statusID = tbl_patient_status.statusID
     
                 -- Join type of incident table
                 LEFT JOIN tbl_type_incident 

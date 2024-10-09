@@ -8,20 +8,7 @@ if (isset($_GET['PatientID'])) {
     exit();
 }
 ?>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Incident Reports</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <style>
-        #map { height: 500px; width: 88%; margin: 10px}
-    </style>
-</head>
-<body>
+<?php require_once('../../components/header.php')?>
     <h1>Incident Reports</h1>
     <div id="map"></div>
 
@@ -114,5 +101,4 @@ if (isset($_GET['PatientID'])) {
                 .openOn(map);
         });
     </script>
-</body>
-</html>
+<?php require_once('../../components/footer.php')?>

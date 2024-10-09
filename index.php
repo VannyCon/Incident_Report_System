@@ -1,58 +1,59 @@
+<?php 
+    include_once('controller/LoginController.php');
+?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Leaflet Map with Customized Button</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <style>
-        #map { height: 500px; width: 100%; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <h1>Leaflet Map with Customized Button in Popups</h1>
-    <div id="map"></div>
-    <script>
-        // Set map to your location or a default view
-        var map = L.map('map').setView([10.948713, 123.336492], 12); // Default map location
+<body style="background-color: #f5f5f5;">
+  <div class="container p-2">
+          <section class="vh-100">
+            <div class="container py-2 h-100">
+              <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                  <div class="card shadow-2-strong" style="border-radius: 1rem;">
+                    <div class="card-body p-4 text-left">
+                      <div class="text-center">
+                          <img src="assets/images/logo.png" alt="" srcset="" width="auto" height="150">
+                      </div>
+                          <form action="" method="post">
+                              <div data-mdb-input-init class="form-outline mb-2">
+                              <?php if (isset($_GET['error'])): ?>
+                                  <p style="color: red;">Invalid username or password.</p>
+                              <?php endif; ?>
 
-        // Load and display OpenStreetMap tiles
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+                                  <label class="form-label" for="typeEmailX-2">Username</label>
+                                      <input type="text" id="typeEmailX-2" name="username" class="form-control form-control-lg" required/>
+                                  </div>
 
-        // Fetch GPS locations from the database via AJAX
-        fetch('index.php')
-            .then(response => response.json())
-            .then(data => {
-                // Loop through the data and add markers to the map
-                data.forEach(location => {
-                    var lat = 10.949461773876305;  // Assuming 'lat' is a column in your 'gps_locations' table
-                    var lng = 123.33953189692694;  // Assuming 'lng' is a column in your 'gps_locations' table
-                    
-                    var marker = L.marker([lat, lng]).addTo(map);
+                                  <div data-mdb-input-init class="form-outline mb-4">
+                                  <label class="form-label" for="typePasswordX-2">Password</label>
+                                      <input type="password" id="typePasswordX-2" name="password" class="form-control form-control-lg" required/>
+                                  </div>
+                                  <input type="hidden" name="action" value="login">
+                                  <!-- Checkbox -->
+                                  <div class="form-check d-flex justify-content-start mb-4">
+                                  <input class="form-check-input" type="checkbox" value="" id="form1Example3" />
+                                  <label class="form-check-label" for="form1Example3"> Remember password </label>
+                                  </div>
 
-                    // Customize popup with a button
-                    var popupContent = `
-                        <div>
-                            <strong>Location:</strong> ${lat}, ${lng}<br>
-                            <button onclick="handleButtonClick(${lat}, ${lng})">Click Me</button>
-                        </div>
-                    `;
+                                  <button data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg btn-block" type="submit">Login</button>
+                          </form>
 
-                    marker.bindPopup(popupContent);
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching GPS data:', error);
-            });
-
-        // Function to handle button click event
-        function handleButtonClick(lat, lng) {
-            alert('Button clicked at location: ' + lat + ', ' + lng);
-            // You can add further actions here, such as opening a modal or redirecting to another page
-        }
-    </script>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+      </div>
+  <?php 
+      include_once('view/components/footer.php');
+  ?>
 </body>
 </html>
+

@@ -2,7 +2,7 @@
     session_start();
     // Redirect to login if not logged in
     if (isset($_SESSION['username'])) {
-        header("Location: view/pages/Dashboard/index.php");
+        header("Location: view/pages/admin/index.php");
         exit();
     }
     require('services/LoginAccessService.php');
@@ -16,7 +16,7 @@
         if (!empty($username) && !empty($password)) { 
             $status = $access->login($username,$password);
             if($status == true){
-                header("Location: view/pages/Dashboard/index.php");
+                header("Location: view/pages/admin/index.php");
                 exit();
             }else{
                 header("Location: index.php?error=1");

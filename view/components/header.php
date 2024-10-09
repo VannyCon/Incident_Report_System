@@ -9,88 +9,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nursery Owners</title>
     <!-- Bootstrap CSS CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="../../css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        #map { height: 500px; width: 98%; margin: 10px}
+    </style>
 </head>
-<body class="px-1 px-md-5">
-<style>
-    
-.navbar {
-    margin-top: 20px
-}
-
-.navbar-brand {
-    font-weight: bold;
-}
-
-.btn-logout {
-    background-color: #dc3545;
-    color: white;
-}
-
-.dashboard-card {
-    background-color: white;
-    border-radius: 5px;
-    padding: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.stat-number {
-    font-size: 3rem;
-    font-weight: bold;
-    color: #8B4513;
-}
-
-.stat-label {
-    color: #6c757d;
-}
-
-.action-button {
-    background-color: #8B4513;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    width: 100%;
-    margin-top: 10px;
-}
-
-.recent-activities {
-    background-color: white;
-    border-radius: 8px;
-    padding: 20px;
-    margin-top: 20px;
-}
-
-.stats-container {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-.stats-row {
-    display: flex;
-    flex: 1;
-}
-
-.stats-col {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-}
-
-.stats-card {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-</style>
+<body class="px-1 px-md-5" style="background-color: #ebedeb">
 
 <?php 
     // Redirect to login if not logged in
-    if (!isset($_SESSION['username']) && $title != "User") {
+    if (isset($_SESSION['username']) && $title != "User") {
         echo "
                 <nav class='navbar navbar-expand-lg navbar-light'>
                     <div class='container-fluid'>
@@ -101,10 +31,10 @@
                         <div class='collapse navbar-collapse' id='navbarNav'>
                             <ul class='navbar-nav ms-auto'>
                                 <li class='nav-item'>
-                                    <a class='nav-link ms-3' href='../Dashboard/index.php'>Dashboard</a>
+                                    <a class='nav-link ms-3' href='../admin/index.php'>Dashboard</a>
                                 </li>
                                 <li class='nav-item'>
-                                    <a class='nav-link ms-3' href='#'>About</a>
+                                    <a class='nav-link ms-3' href='#'>Report</a>
                                 </li>
                                 <li class='nav-item'>
                                   <form action='' method='post' class='ms-3'>

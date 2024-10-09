@@ -1,23 +1,22 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Incident Reports</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <style>
-        #map { height: 500px; width: 88%; margin: 10px}
-    </style>
-</head>
-<body>
-    <h1>Incident Reports</h1>
+<?php
+$title = "admin";
+session_start();
+// Redirect to login if not logged in
+if (!isset($_SESSION['username'])) {
+    header("Location: ../../../index.php");
+    exit();
+}
+require_once('../../components/header.php')?>
+    <h3 class="ms-2"><strong>Incident Map</strong></h3>
     <div id="map"></div>
-
+    <div class="m-3">
+        <p>Red <img src="../../../assets/images/red_marker.png" alt="" srcset="" width="20"> High Risk</p>
+        <p>Yellow <img src="../../../assets/images/yellow_marker.png" alt="" srcset="" width="20"> Medium Risk</p>
+        <p>Blue <img src="../../../assets/images/blue_marker.png" alt="" srcset="" width="20"> Low Risk</p>
+    </div>
     <script>
         // Initialize the map
-        var map = L.map('map').setView([10.948713, 123.336492], 12);
+        var map = L.map('map').setView([10.948713, 123.336492], 14);
 
         // Load OpenStreetMap tiles
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -104,5 +103,5 @@
                 .openOn(map);
         });
     </script>
-</body>
-</html>
+
+<?php require_once('../../components/footer.php')?>
