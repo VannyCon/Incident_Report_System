@@ -1,20 +1,22 @@
 <?php
-require_once('../../../controller/AdminController.php');
-$title = 'Update';
-if (isset($_GET['incidentID'])) {
-    $incidentID = $_GET['incidentID'];
-}else{
-    header("Location: map.php");
+$title = "admin";
+session_start();
+// Redirect to login if not logged in
+if (!isset($_SESSION['username'])) {
+    header("Location: ../../../index.php");
     exit();
 }
-?>
-<?php require_once('../../components/header.php')?>
-    <h1>Incident Reports</h1>
+require_once('../../components/header.php')?>
+    <h3 class="ms-2"><strong>Incident Map</strong></h3>
     <div id="map"></div>
-
+    <div class="m-3">
+        <p>Red <img src="../../../assets/images/red_marker.png" alt="" srcset="" width="20"> High Risk</p>
+        <p>Yellow <img src="../../../assets/images/yellow_marker.png" alt="" srcset="" width="20"> Medium Risk</p>
+        <p>Blue <img src="../../../assets/images/blue_marker.png" alt="" srcset="" width="20"> Low Risk</p>
+    </div>
     <script>
         // Initialize the map
-        var map = L.map('map').setView([10.948713, 123.336492], 12);
+        var map = L.map('map').setView([10.948713, 123.336492], 14);
 
         // Load OpenStreetMap tiles
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -67,7 +69,7 @@ if (isset($_GET['incidentID'])) {
                     L.marker([lat, lng], { icon: icon }).addTo(map)
                         .bindPopup(`<div>
                             <strong>Incident Cases:</strong> ${cases}<br>
-                            <a class="btn btn-info w-100 text-white" href="update.php?incidentID=<?php echo $incidentID ?>&locID=${locID}&lat=${lat}&long=${lng}")">Select this Location</a>
+                            <a class="btn btn-primary w-100 text-white" href="location_incident.php?locID=${locID}&lat=${lat}&long=${lng}")">Manage</a>
                         </div>`);
                 });
             })
@@ -78,7 +80,7 @@ if (isset($_GET['incidentID'])) {
         // Function to handle confirming a location and redirecting to create.php
         function confirmLocation(lat, lng) {
             // Redirect to create.php with latitude and longitude as URL parameters
-            window.location.href = `update.php?incidentID=<?php echo $incidentID ?>&lat=${lat}&long=${lng}`;
+            window.location.href = `create.php?lat=${lat}&long=${lng}`;
         }
 
 
@@ -91,7 +93,7 @@ if (isset($_GET['incidentID'])) {
             var popupContent = `
                 <div>
                     <p>Don't have Case Here!</p>
-                    <button class="btn btn-warning w-100" onclick="confirmLocation(${lat}, ${lng})">Select this Location</button>
+                    <button class="btn btn-warning w-100" onclick="confirmLocation(${lat}, ${lng})">Add</button>
                 </div>
             `;
 
@@ -101,4 +103,5 @@ if (isset($_GET['incidentID'])) {
                 .openOn(map);
         });
     </script>
+
 <?php require_once('../../components/footer.php')?>

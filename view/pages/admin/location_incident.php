@@ -23,7 +23,7 @@
 
 <?php require_once('../../components/header.php')?>
 <div class="d-flex justify-content-between mx-5 mt-5">
-    <a href="index.php" class="btn btn-outline-danger">Back</a>
+    <a href="map.php" class="btn btn-outline-danger">Back</a>
     <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#updateLocationNameModal" data-id="<?= $incident['incidentID_fk'] ?>">
         Update Location Name
     </button>

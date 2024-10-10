@@ -47,7 +47,7 @@ if (isset($incidentData['patients'])) {
     <?php endif; ?>
 
     <form action="" method="POST">
-        <a href="update_map.php?PatientID=<?php echo htmlspecialchars($patientID); ?>" class="btn btn-info text-white my-2">Change Location?</a>
+        <a href="update_map.php?incidentID=<?php echo htmlspecialchars($incidentID); ?>" class="btn btn-info text-white my-2">Change Location?</a>
         
         <!-- Select Incident Type -->
         <div class="mb-3">

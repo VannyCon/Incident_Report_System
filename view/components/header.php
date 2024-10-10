@@ -12,11 +12,12 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         #map { height: 500px; width: 98%; margin: 10px}
     </style>
 </head>
-<body class="px-1 px-md-5" style="background-color: #ebedeb">
+<body class="px-1 px-md-5" style="background-color: #fffcfc">
 
 <?php 
     // Redirect to login if not logged in
@@ -32,6 +33,9 @@
                             <ul class='navbar-nav ms-auto'>
                                 <li class='nav-item'>
                                     <a class='nav-link ms-3' href='index.php'>Dashboard</a>
+                                </li>
+                                 <li class='nav-item'>
+                                    <a class='nav-link ms-3' href='map.php'>Map</a>
                                 </li>
                                 <li class='nav-item'>
                                     <a class='nav-link ms-3' href='report.php'>Report</a>

@@ -5,7 +5,7 @@ require_once('../../../controller/AdminController.php'); ?>
 <?php require_once('../../components/header.php')?>
 
   <div class="container mt-5">
-    <a href="index.php" class="btn btn-outline-danger">Back</a>
+    <a href="map.php" class="btn btn-outline-danger">Back</a>
     <h2>Incident Report Form</h2>
     <?php if (!empty($error_message)): ?>
             <div class="alert alert-danger" role="alert">

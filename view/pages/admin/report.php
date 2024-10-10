@@ -9,7 +9,7 @@
     require_once('../../components/header.php')?>
 <!-- Font Awesome CDN -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+<h3 class="ms-2"><strong>Report</strong></h3>
 <div class="container p-2">
     <section class="vh-50">
         <div class="container py-2 h-100">

@@ -2,10 +2,10 @@
 session_start();
 
 require_once('../../../services/AdminService.php');
-
+require_once('../../../services/DashboardService.php');
 // Redirect to login if not logged in
 if (!isset($_SESSION['username'])) {
-    header("Location: ../../../index.php");
+    header("Location: ../../../map.php");
     exit();
 }
 
@@ -88,8 +88,8 @@ if (isset($_GET['lat']) && isset($_GET['long'])) {
                 $locID 
             );
             if ($status === true) {
-                // Redirect to index.php after success
-                header("Location: index.php");
+                // Redirect to map.php after success
+                header("Location: map.php");
                 exit();
             } else {
                 $error_message = $status;
@@ -123,7 +123,7 @@ if (isset($_GET['lat']) && isset($_GET['long'])) {
             );
 
             if ($status === true) {
-                // Redirect to index.php after success
+                // Redirect to map.php after success
                 header("Location: location_incident.php?locID=$locID&lat=$latitude&long=$longitude");
                 exit();
             } else {
@@ -136,8 +136,8 @@ if (isset($_GET['lat']) && isset($_GET['long'])) {
             $incidentID_fk = $_POST['incidentID'];
             $status = $adminService->deleteIncidentByID($incidentID_fk);
             if ($status === true) {
-                // Redirect to index.php after success
-                header("Location: index.php");
+                // Redirect to map.php after success
+                header("Location: map.php");
                 exit();
             }
         }

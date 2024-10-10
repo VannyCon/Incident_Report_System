@@ -44,9 +44,24 @@ $pdf->SetTextColor(0, 0, 0); // Black text
 // Add data rows
 if (!empty($monthDatas)) {
     foreach ($monthDatas as $data) {
-        $pdf->Cell(70, 10, $data['barangay'], 1);
-        $pdf->Cell(70, 10, $data['incident_count'], 1);
-        $pdf->Cell(0, 10, $data['incident_types'], 1, 1);
+      
+        // Determine the height based on the length of the incident types
+        $incidentTypes = $data['incident_types'];
+        $length = strlen($incidentTypes); // Get the length of the incident types
+        // Set height based on the number of characters
+        if ($length > 50) {
+            $cellHeight = 25; // Height for more than 50 characters
+        } elseif ($length > 25) {
+            $cellHeight = 12; // Height for more than 25 characters
+        } else {
+            $cellHeight = 10; // Default height for 25 characters or fewer
+        } 
+
+        $pdf->Cell(70, $cellHeight, $data['barangay'], 1);
+        $pdf->Cell(70, $cellHeight, $data['incident_count'], 1);
+        // Create the MultiCell with the determined height
+        $pdf->MultiCell(0, $cellHeight, $incidentTypes, 1, 'L', false);
+
     }
 } else {
     $pdf->Cell(0, 10, "No incident data available", 1, 1);
