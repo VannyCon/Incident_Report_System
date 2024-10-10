@@ -28,6 +28,7 @@ class AdminServices extends config {
                         tbl_incident.incident_date,
     
                         tbl_patient_info.patient_name,
+                        tbl_patient_info.patient_birthdate,
                         tbl_patient_info.patient_age,
                         tbl_patient_info.patient_sex,
                         tbl_patient_info.patient_address,
@@ -121,6 +122,7 @@ class AdminServices extends config {
                 // Add patient info to the patients array
                 $incidents[$incidentID]['patients'][] = [
                     'patient_name' => $row['patient_name'],
+                    'patient_birthdate' => $row['patient_birthdate'],
                     'patient_age' => $row['patient_age'],
                     'patient_sex' => $row['patient_sex'],
                     'patient_address' => $row['patient_address'],
@@ -187,7 +189,7 @@ class AdminServices extends config {
         
     public function getIncidentPatientsById($incidentID) {
         try {
-            $query = "SELECT `id`, `incidentID_fk`, `patientID`, `statusID`, `patient_name`, `patient_age`, `patient_sex`, `patient_address` FROM `tbl_patient_info` WHERE incidentID_fk = :incidentID";
+            $query = "SELECT `id`, `incidentID_fk`, `patientID`, `statusID`, `patient_name`, `patient_birthdate`, `patient_age`, `patient_sex`, `patient_address` FROM `tbl_patient_info` WHERE incidentID_fk = :incidentID";
     
             $stmt = $this->pdo->prepare($query); // Prepare the query
             $stmt->bindParam(':incidentID', $incidentID);  // Bind the value
@@ -345,12 +347,13 @@ class AdminServices extends config {
             foreach ($patients as $patient) {
                 $patientID = $this->generatePatientID();  // Generate unique patientID for each patient
                 // Insert patient info
-                $tbl_patient_info_query = "INSERT INTO `tbl_patient_info`(`incidentID_fk`, `patientID`, `statusID`, `patient_name`, `patient_age`, `patient_sex`, `patient_address`) VALUES (:incidentID_fk, :patientID, :statusID, :patient_name, :patient_age, :patient_sex, :patient_address)";
+                $tbl_patient_info_query = "INSERT INTO `tbl_patient_info`(`incidentID_fk`, `patientID`, `statusID`, `patient_name`, `patient_birthdate`, `patient_age`, `patient_sex`, `patient_address`) VALUES (:incidentID_fk, :patientID, :statusID, :patient_name, :patient_birthdate, :patient_age, :patient_sex, :patient_address)";
                 $stmt2 = $this->pdo->prepare($tbl_patient_info_query);
                 $stmt2->bindParam(':incidentID_fk', $incidentID);
                 $stmt2->bindParam(':patientID', $patientID);
                 $stmt2->bindParam(':statusID', $patient['statusID']);
                 $stmt2->bindParam(':patient_name', $patient['patient_name']);
+                $stmt2->bindParam(':patient_birthdate', $patient['patient_birthdate']);
                 $stmt2->bindParam(':patient_age', $patient['patient_age']);
                 $stmt2->bindParam(':patient_sex', $patient['patient_sex']);
                 $stmt2->bindParam(':patient_address', $patient['patient_address']);
@@ -392,7 +395,6 @@ class AdminServices extends config {
         }
     }
 
-    // UPDATE INCIDENT
     public function updateIncident( 
         $incidentID_fk,
         $latitude, 
@@ -416,10 +418,10 @@ class AdminServices extends config {
             // Begin the transaction
             $this->pdo->beginTransaction();
             
-            if($locID != null){
+            if ($locID != null) {
                 $locationID = $locID;
                 // Execute the fourth query
-            }else{
+            } else {
                 $locationID = $this->generateLocationID();
                 $table_incident_location_query = "INSERT INTO `tbl_incident_location`(`locationID`, `latitude`, `longitude`) VALUES (:locationID, :latitude, :longitude)";
                 $stmt1 = $this->pdo->prepare($table_incident_location_query);
@@ -428,24 +430,48 @@ class AdminServices extends config {
                 $stmt1->bindParam(':longitude', $longitude);
                 $stmt1->execute();
             }
-
-             // Insert each patient data
-             foreach ($patients as $patient) {
-                // Update patient info
-                $update_patient_info_query = "UPDATE `tbl_patient_info` SET `statusID` = :statusID, `patient_name` = :patient_name, `patient_age` = :patient_age, `patient_sex` = :patient_sex, `patient_address` = :patient_address WHERE `patientID` = :patientID";
-                $stmt2 = $this->pdo->prepare($update_patient_info_query);
+    
+            // Insert or update each patient data
+            foreach ($patients as $patient) {
+                // Check if the patient exists in the database
+                $check_patient_query = "SELECT COUNT(*) FROM `tbl_patient_info` WHERE `patientID` = :patientID";
+                $stmt_check = $this->pdo->prepare($check_patient_query);
+                $stmt_check->bindParam(':patientID', $patient['patientID']);
+                $stmt_check->execute();
                 
-                $stmt2->bindParam(':statusID', $patient['statusID']);
-                $stmt2->bindParam(':patient_name', $patient['patient_name']);
-                $stmt2->bindParam(':patient_age', $patient['patient_age']);
-                $stmt2->bindParam(':patient_sex', $patient['patient_sex']);
-                $stmt2->bindParam(':patient_address', $patient['patient_address']);
-                $stmt2->bindParam(':patientID', $patient['patientID']);
-                $stmt2->execute();
+                $exists = $stmt_check->fetchColumn() > 0;
+    
+                if ($exists) {
+                    // Update patient info
+                    $update_patient_info_query = "UPDATE `tbl_patient_info` SET `statusID` = :statusID, `patient_name` = :patient_name, `patient_birthdate` = :patient_birthdate, `patient_age` = :patient_age, `patient_sex` = :patient_sex, `patient_address` = :patient_address WHERE `patientID` = :patientID";
+                    $stmt2 = $this->pdo->prepare($update_patient_info_query);
+                    
+                    $stmt2->bindParam(':statusID', $patient['statusID']);
+                    $stmt2->bindParam(':patient_name', $patient['patient_name']);
+                    $stmt2->bindParam(':patient_birthdate', $patient['patient_birthdate']);
+                    $stmt2->bindParam(':patient_age', $patient['patient_age']);
+                    $stmt2->bindParam(':patient_sex', $patient['patient_sex']);
+                    $stmt2->bindParam(':patient_address', $patient['patient_address']);
+                    $stmt2->bindParam(':patientID', $patient['patientID']);
+                    $stmt2->execute();
+                } else {
+                    $patientID = $this->generatePatientID();
+                    // Insert new patient info
+                    $insert_patient_info_query = "INSERT INTO `tbl_patient_info` (`incidentID_fk`,`patientID`, `statusID`, `patient_name`, `patient_birthdate`, `patient_age`, `patient_sex`, `patient_address`) VALUES (:incidentID_fk, :patientID, :statusID, :patient_name, :patient_birthdate, :patient_age, :patient_sex, :patient_address)";
+                    $stmt3 = $this->pdo->prepare($insert_patient_info_query);
+                    
+                    $stmt3->bindParam(':incidentID_fk', $incidentID_fk);
+                    $stmt3->bindParam(':patientID', $patientID);
+                    $stmt3->bindParam(':statusID', $patient['statusID']);
+                    $stmt3->bindParam(':patient_name', $patient['patient_name']);
+                    $stmt3->bindParam(':patient_birthdate', $patient['patient_birthdate']);
+                    $stmt3->bindParam(':patient_age', $patient['patient_age']);
+                    $stmt3->bindParam(':patient_sex', $patient['patient_sex']);
+                    $stmt3->bindParam(':patient_address', $patient['patient_address']);
+                    $stmt3->execute();
+                }
             }
-
-
-
+    
             // Update incident
             $update_incident_query = "UPDATE `tbl_incident` SET `locationID_fk` = :locationID_fk, `complaint` = :complaint, `rescuer_team` = :rescuer_team, `referred_hospital` = :referred_hospital, `incident_date` = :incident_date WHERE `incidentID_fk` = :incidentID_fk";
             $stmt3 = $this->pdo->prepare($update_incident_query);
@@ -456,8 +482,7 @@ class AdminServices extends config {
             $stmt3->bindParam(':incident_date', $incident_date);
             $stmt3->bindParam(':incidentID_fk', $incidentID_fk);
             $stmt3->execute();
-
-
+    
             // Update type of incident
             $update_type_of_incident_query = "UPDATE `tbl_type_incident` SET `isVehiclular` = :isVehiclular, `type_of_incident` = :type_of_incident, `description` = :description WHERE `incidentID` = :incidentID";
             $stmt4 = $this->pdo->prepare($update_type_of_incident_query);
@@ -466,26 +491,45 @@ class AdminServices extends config {
             $stmt4->bindParam(':description', $description);
             $stmt4->bindParam(':incidentID', $incidentID_fk);
             $stmt4->execute();
-
+    
             // If vehicular, update the vehicular incident details
-            if($isVehiclular) {  
-                $update_vehicular_incident_query = "UPDATE `tbl_vehicular_incident` SET `patient_classification` = :patient_classification, `vehicle_type` = :vehicle_type, `intoxication` = :intoxication, `helmet` = :helmet, `stray` = :stray WHERE `incidentID` = :incidentID";
-                $stmt5 = $this->pdo->prepare($update_vehicular_incident_query);
-                $stmt5->bindParam(':patient_classification', $patient_classification);
-                $stmt5->bindParam(':vehicle_type', $vehicle_type);
-                $stmt5->bindParam(':intoxication', $intoxication);
-                $stmt5->bindParam(':helmet', $helmet);
-                $stmt5->bindParam(':stray', $stray);
-                $stmt5->bindParam(':incidentID', $incidentID_fk);
-                $stmt5->execute();
+            if ($isVehiclular) {  
+                $check_incident_query = "SELECT `incidentID` FROM `tbl_vehicular_incident` WHERE incidentID= :incidentID_fk";
+                $stmt_check_incident = $this->pdo->prepare($check_incident_query); // Changed the variable name here
+                $stmt_check_incident->bindParam(':incidentID_fk', $incidentID_fk);
+                $stmt_check_incident->execute();
+    
+                $exists = $stmt_check_incident->fetchColumn() > 0;
+    
+                if ($exists) {
+                    $update_vehicular_incident_query = "UPDATE `tbl_vehicular_incident` SET `patient_classification` = :patient_classification, `vehicle_type` = :vehicle_type, `intoxication` = :intoxication, `helmet` = :helmet, `stray` = :stray WHERE `incidentID` = :incidentID";
+                    $stmt5 = $this->pdo->prepare($update_vehicular_incident_query);
+                    $stmt5->bindParam(':patient_classification', $patient_classification);
+                    $stmt5->bindParam(':vehicle_type', $vehicle_type);
+                    $stmt5->bindParam(':intoxication', $intoxication);
+                    $stmt5->bindParam(':helmet', $helmet);
+                    $stmt5->bindParam(':stray', $stray);
+                    $stmt5->bindParam(':incidentID', $incidentID_fk);
+                    $stmt5->execute();
+                } else {
+                    $va_incident_query = "INSERT INTO `tbl_vehicular_incident`(`incidentID`, `patient_classification`, `vehicle_type`, `intoxication`, `helmet`, `stray`) VALUES (:incidentID, :patient_classification, :vehicle_type, :intoxication, :helmet, :stray)";
+                    $stmt5 = $this->pdo->prepare($va_incident_query);
+                    $stmt5->bindParam(':incidentID', $incidentID_fk);
+                    $stmt5->bindParam(':patient_classification', $patient_classification);
+                    $stmt5->bindParam(':vehicle_type', $vehicle_type);
+                    $stmt5->bindParam(':intoxication', $intoxication);
+                    $stmt5->bindParam(':helmet', $helmet);
+                    $stmt5->bindParam(':stray', $stray);
+                    $stmt5->execute();
+                }
             }
-
+    
             // Commit the transaction
             $this->pdo->commit();
-
+    
             // Return success
             return true;
-
+    
         } catch (PDOException $e) {
             // Rollback the transaction in case of error
             $this->pdo->rollBack();
@@ -493,6 +537,7 @@ class AdminServices extends config {
             return "Error: " . $e->getMessage();
         }
     }
+    
 
     // UPDATE INCIDENT
     public function updateBrgyLocation($locID, $location_name) {
@@ -554,6 +599,7 @@ class AdminServices extends config {
                     tbl_incident.id AS incident_id,
                     tbl_incident.patientID_fk,
                     tbl_patient_info.patient_name,
+                    tbl_patient_info.patient_birthdate,
                     tbl_patient_info.patient_age,
                     tbl_patient_info.patient_sex,
                     tbl_patient_info.patient_address,

@@ -28,6 +28,7 @@ require_once('../../../controller/AdminController.php'); ?>
           echo " <div class='mb-3'>
                   <label for='incidentType' class='form-label'>Baranggay</label>
                   <select class='form-select' id='incidentType' name='location_name' aria-label='Location'>
+                    <option value='''' selected disabled>Choose a Baranggay</option>
                     <option value='Andres Bonifacio'>Andres Bonifacio</option>
                     <option value='Bato'>Bato</option>
                     <option value='Baviera'>Baviera</option>
@@ -73,6 +74,10 @@ require_once('../../../controller/AdminController.php'); ?>
                         <div class="mb-3">
                             <label for="patientName" class="form-label">Patient Name</label>
                             <input type="text" class="form-control" name="patient_name[]" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="patientbirthdate" class="form-label">Patient Birthdate</label>
+                            <input type="date" class="form-control" name="patient_birthdate[]" required>
                         </div>
                         <div class="mb-3">
                             <label for="patientAge" class="form-label">Patient Age</label>
@@ -214,6 +219,10 @@ require_once('../../../controller/AdminController.php'); ?>
                 <div class="mb-3">
                     <label for="patientName" class="form-label">Patient Name</label>
                     <input type="text" class="form-control" name="patient_name[]" required>
+                </div>
+                <div class="mb-3">
+                    <label for="patientbirthdate" class="form-label">Patient Birthdate</label>
+                    <input type="date" class="form-control" name="patient_birthdate[]" required>
                 </div>
                 <div class="mb-3">
                     <label for="patientAge" class="form-label">Patient Age</label>

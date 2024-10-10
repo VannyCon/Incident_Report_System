@@ -26,6 +26,7 @@ if (isset($incidentData['patients'])) {
     foreach ($incidentData['patients'] as $patient) {
         $patients[] = [
             'name' => $patient['name'],
+            'age' => $patient['patient_birthdate'],
             'age' => $patient['age'],
             'sex' => $patient['sex'],
             'address' => $patient['address'],
@@ -39,6 +40,7 @@ if (isset($incidentData['patients'])) {
 <?php require_once('../../components/header.php') ?>
 
 <div class="container mt-5">
+<a href="map.php" class="btn btn-outline-danger">Back</a>
     <h2>Update Incident Report Form</h2>
     <?php if (!empty($error_message)): ?>
         <div class="alert alert-danger" role="alert">
@@ -71,55 +73,65 @@ if (isset($incidentData['patients'])) {
 
             $patients = $adminService->getIncidentPatientsById($incidentID);
             if (!empty($patients)): ?>
-                <?php foreach ($patients as $index => $patient): // Include index for count ?>
-                    <div class="patient-form card mb-3" id="patient-form-<?php echo $index + 1; ?>">
-                        <div class="card-header">
-                            <h4><?php echo ordinal($index + 1); ?> Patient Information</h4>
+               
+                    <!-- PATIENT INFORMATION -->
+                    <div id="patients-container">
+                        <?php foreach ($patients as $index => $patient): // Include index for count ?>
+                        <!-- Initial patient form -->
+                        <div class="patient-form card mb-3">
+                            <div class="card-header">
+                                <h4><?php echo ordinal($index + 1); ?> Patient Information</h4>
+                            </div>
+                            <input type="hidden" class="form-control" name="patientID[]" value="<?php echo htmlspecialchars($patient['patientID']); ?>" required>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="patientName" class="form-label">Patient Name</label>
+                                    <input type="text" class="form-control" name="patient_name[]" value="<?php echo htmlspecialchars($patient['patient_name']); ?>" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="patientbirthdate" class="form-label">Patient Birthdate</label>
+                                    <input type="date" class="form-control" name="patient_birthdate[]" value="<?php echo htmlspecialchars($patient['patient_birthdate']); ?>" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="patientAge" class="form-label">Patient Age</label>
+                                    <input type="number" class="form-control" name="patient_age[]" value="<?php echo htmlspecialchars($patient['patient_age']); ?>" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="patientSex" class="form-label">Patient Sex</label>
+                                    <select class="form-select" name="patient_sex[]" required>
+                                        <option value="Male" <?php echo ($patient['patient_sex'] === 'Male') ? 'selected' : ''; ?>>Male</option>
+                                        <option value="Female" <?php echo ($patient['patient_sex'] === 'Female') ? 'selected' : ''; ?>>Female</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="patientAddress" class="form-label">Patient Address</label>
+                                    <input type="text" class="form-control" name="patient_address[]" value="<?php echo htmlspecialchars($patient['patient_address']); ?>" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="patient_status" class="form-label">Status</label>
+                                    <select class="form-select" name="statusID[]" aria-label="Patient Status" required>
+                                        <option value="" disabled>Choose a patient status</option>
+                                        <option value="SID-001" <?php echo ($patient['statusID'] === 'SID-001') ? 'selected' : ''; ?>>Green</option>
+                                        <option value="SID-002" <?php echo ($patient['statusID'] === 'SID-002') ? 'selected' : ''; ?>>Yellow</option>
+                                        <option value="SID-003" <?php echo ($patient['statusID'] === 'SID-003') ? 'selected' : ''; ?>>Red</option>
+                                        <option value="SID-004" <?php echo ($patient['statusID'] === 'SID-004') ? 'selected' : ''; ?>>Black</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                        <input type="hidden" class="form-control" name="patientID[]" value="<?php echo htmlspecialchars($patient['patientID']); ?>" required>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label for="patientName" class="form-label">Patient Name</label>
-                                <input type="text" class="form-control" name="patient_name[]" value="<?php echo htmlspecialchars($patient['patient_name']); ?>" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="patientAge" class="form-label">Patient Age</label>
-                                <input type="number" class="form-control" name="patient_age[]" value="<?php echo htmlspecialchars($patient['patient_age']); ?>" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="patientSex" class="form-label">Patient Sex</label>
-                                <select class="form-select" name="patient_sex[]" required>
-                                    <option value="Male" <?php echo ($patient['patient_sex'] === 'Male') ? 'selected' : ''; ?>>Male</option>
-                                    <option value="Female" <?php echo ($patient['patient_sex'] === 'Female') ? 'selected' : ''; ?>>Female</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="patientAddress" class="form-label">Patient Address</label>
-                                <input type="text" class="form-control" name="patient_address[]" value="<?php echo htmlspecialchars($patient['patient_address']); ?>" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="patient_status" class="form-label">Status</label>
-                                <select class="form-select" name="statusID[]" aria-label="Patient Status" required>
-                                    <option value="" disabled>Choose a patient status</option>
-                                    <option value="SID-001" <?php echo ($patient['statusID'] === 'SID-001') ? 'selected' : ''; ?>>Green</option>
-                                    <option value="SID-002" <?php echo ($patient['statusID'] === 'SID-002') ? 'selected' : ''; ?>>Yellow</option>
-                                    <option value="SID-003" <?php echo ($patient['statusID'] === 'SID-003') ? 'selected' : ''; ?>>Red</option>
-                                    <option value="SID-004" <?php echo ($patient['statusID'] === 'SID-004') ? 'selected' : ''; ?>>Black</option>
-                                </select>
-                            </div>
-                        </div>
+                        <?php endforeach; ?>
                     </div>
-                <?php endforeach; ?>
+
             <?php else: ?>
                 <p>No patients found for this incident.</p>
             <?php endif; ?>
 
 
-        
-        <!-- Button to add another patient section -->
-        <div class="mb-3">
-            <button type="button" class="btn btn-secondary" onclick="addPatientForm()">Add Another Patient</button>
-        </div>
+            <!-- Button to add another patient section -->
+            <div class="mb-3">
+                <button type="button" class="btn btn-secondary" onclick="addPatientForm()">Add Another Patient</button>
+            </div>
+
 
         <h4>Incident Details</h4>
         <div class="mb-3">
@@ -195,29 +207,39 @@ if (isset($incidentData['patients'])) {
     </form>
 </div>
 
+
 <script>
-function toggleIncidentForm() {
-    const incidentType = document.getElementById('incidentType').value;
-    const vehicularForm = document.getElementById('vehicular-form');
+    let patientCount = 1; // Initialize patient count
 
-    if (incidentType === 'isVehiclular') {
-        vehicularForm.classList.remove('d-none');
-    } else {
-        vehicularForm.classList.add('d-none');
-    }
-}
+    function addPatientForm() {
+        // Increment the patient count
+        patientCount++;
 
-function addPatientForm() {
-    const patientCount = document.querySelectorAll('.patient-form').length + 1;
-    const newPatientForm = `
-        <div class="patient-form card mb-3" id="patient-form-${patientCount}">
-            <div class="card-header">
-                <h4>${ordinal(patientCount)} Patient Information</h4>
+        // Get the container where the new form fields will be added
+        const patientsContainer = document.getElementById('patients-container');
+
+        // Create a new patient form
+        const newForm = document.createElement('div');
+        newForm.classList.add('patient-form', 'card', 'mb-3');
+
+        // Generate a unique ID for the form to be able to remove it later
+        const formId = `patient-form-${patientCount}`;
+        newForm.setAttribute('id', formId);
+
+        // Add the new form fields with a delete button
+        newForm.innerHTML = `
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4>Add Patient Information</h4>
+                <button type="button" class="btn btn-danger btn-sm" onclick="removePatientForm('${formId}')">Delete</button>
             </div>
             <div class="card-body">
                 <div class="mb-3">
                     <label for="patientName" class="form-label">Patient Name</label>
                     <input type="text" class="form-control" name="patient_name[]" required>
+                </div>
+                <div class="mb-3">
+                    <label for="patientbirthdate" class="form-label">Patient Birthdate</label>
+                    <input type="date" class="form-control" name="patient_birthdate[]" required>
                 </div>
                 <div class="mb-3">
                     <label for="patientAge" class="form-label">Patient Age</label>
@@ -237,7 +259,7 @@ function addPatientForm() {
                 <div class="mb-3">
                     <label for="patient_status" class="form-label">Status</label>
                     <select class="form-select" name="statusID[]" aria-label="Patient Status" required>
-                        <option value="" disabled>Choose a patient status</option>
+                        <option value="" selected disabled>Choose a patient status</option>
                         <option value="SID-001">Green</option>
                         <option value="SID-002">Yellow</option>
                         <option value="SID-003">Red</option>
@@ -245,11 +267,40 @@ function addPatientForm() {
                     </select>
                 </div>
             </div>
-        </div>
-    `;
-    document.getElementById('patients-container').insertAdjacentHTML('beforeend', newPatientForm);
-}
+        `;
 
-</script>
+        // Append the new form to the container
+        patientsContainer.appendChild(newForm);
+    }
+
+    // Function to remove a patient form
+    function removePatientForm(formId) {
+        const form = document.getElementById(formId);
+        if (form) {
+            form.remove();
+        }
+    }
+
+    // Function to convert number to ordinal (e.g., 1 to "First", 2 to "Second", etc.)
+    function ordinal(n) {
+        const suffixes = ["th", "st", "nd", "rd"];
+        const value = n % 100;
+        return n + (suffixes[(value - 20) % 10] || suffixes[value] || suffixes[0]);
+    }
+
+        document.getElementById('incidentType').addEventListener('change', function() {
+            var incidentType = this.value;
+            if (incidentType === 'isVehiclular') {
+                document.getElementById('vehicular-form').classList.remove('d-none');
+                document.getElementById('other-form').classList.add('d-none');
+            } else if (incidentType === 'isOther') {
+                document.getElementById('other-form').classList.remove('d-none');
+                document.getElementById('vehicular-form').classList.add('d-none');
+            } else {
+                document.getElementById('vehicular-form').classList.add('d-none');
+                document.getElementById('other-form').classList.add('d-none');
+            }
+        });
+    </script>
 
 <?php require_once('../../components/footer.php') ?>

@@ -84,6 +84,7 @@
                                             <!-- Display Patient Information -->
                                             <p class="card-text">
                                                 <strong>Patient Name:</strong> <?= $patient['patient_name']; ?><br>
+                                                <strong>Birthdate:</strong> <?= $patient['patient_birthdate']; ?><br>
                                                 <strong>Age:</strong> <?= $patient['patient_age']; ?><br>
                                                 <strong>Sex:</strong> <?= $patient['patient_sex']; ?><br>
                                                 <strong>Address:</strong> <?= $patient['patient_address']; ?>

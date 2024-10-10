@@ -31,12 +31,13 @@ if (isset($_GET['lat']) && isset($_GET['long'])) {
 
         $patients = [];
 
-        if (isset($_POST['patient_name'], $_POST['patient_age'], $_POST['patient_sex'], $_POST['patient_address'], $_POST['statusID'])) {
+        if (isset($_POST['patient_name'], $_POST['patient_birthdate'], $_POST['patient_age'], $_POST['patient_sex'], $_POST['patient_address'], $_POST['statusID'])) {
             // Iterate over the number of patients based on one of the fields (assuming they are all the same length)
             for ($i = 0; $i < count($_POST['patient_name']); $i++) {
                 $patients[] = [
                     'patientID' => $_POST['patientID'][$i],
                     'patient_name' => $_POST['patient_name'][$i],
+                    'patient_birthdate' => $_POST['patient_birthdate'][$i],
                     'patient_age' => $_POST['patient_age'][$i],
                     'patient_sex' => $_POST['patient_sex'][$i],
                     'patient_address' => $_POST['patient_address'][$i],
