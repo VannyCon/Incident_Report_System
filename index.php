@@ -43,7 +43,8 @@
 
                                   <button data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg btn-block" type="submit">Login</button>
                           </form>
-
+                          <p class="my-2 text-center">or</p>
+                          <a href="view/pages/user/index.php" class="btn btn-outline-success py-3 btn-block">Guest</a>
                     </div>
                   </div>
                 </div>
