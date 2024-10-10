@@ -31,10 +31,10 @@
                         <div class='collapse navbar-collapse' id='navbarNav'>
                             <ul class='navbar-nav ms-auto'>
                                 <li class='nav-item'>
-                                    <a class='nav-link ms-3' href='../admin/index.php'>Dashboard</a>
+                                    <a class='nav-link ms-3' href='index.php'>Dashboard</a>
                                 </li>
                                 <li class='nav-item'>
-                                    <a class='nav-link ms-3' href='#'>Report</a>
+                                    <a class='nav-link ms-3' href='report.php'>Report</a>
                                 </li>
                                 <li class='nav-item'>
                                   <form action='' method='post' class='ms-3'>

@@ -35,6 +35,7 @@ class AdminServices extends config {
     
                         tbl_incident_location.latitude,
                         tbl_incident_location.longitude,
+                        tbl_incident_location.location_name,
                         tbl_patient_status.color AS patient_status_color,
                         tbl_patient_status.description AS patient_status_description,
                         tbl_type_incident.type_of_incident,
@@ -104,6 +105,7 @@ class AdminServices extends config {
                         'incident_date' => $row['incident_date'],
                         'latitude' => $row['latitude'],
                         'longitude' => $row['longitude'],
+                        'location_name' => $row['location_name'],
                         'type_of_incident' => $row['type_of_incident'],
                         'incident_description' => $row['incident_description'],
                         'isVehiclular' => $row['isVehiclular'],
@@ -287,7 +289,8 @@ class AdminServices extends config {
     // CREATE PATIENT
     public function createIncident( 
         $latitude, 
-        $longitude, 
+        $longitude,
+        $location_name, 
         $patients, //array patient info
         $complaint, 
         $rescuer_team, 
@@ -312,9 +315,10 @@ class AdminServices extends config {
                 // Execute the fourth query
             }else{
                 $locationID = $this->generateLocationID();
-                $table_incident_location_query = "INSERT INTO `tbl_incident_location`(`locationID`, `latitude`, `longitude`) VALUES (:locationID, :latitude, :longitude)";
+                $table_incident_location_query = "INSERT INTO `tbl_incident_location`(`locationID`,`location_name`, `latitude`, `longitude`) VALUES (:locationID,:location_name, :latitude, :longitude)";
                 $stmt1 = $this->pdo->prepare($table_incident_location_query);
                 $stmt1->bindParam(':locationID', $locationID);
+                $stmt1->bindParam(':location_name', $location_name);
                 $stmt1->bindParam(':latitude', $latitude);
                 $stmt1->bindParam(':longitude', $longitude);
                 $stmt1->execute();
@@ -490,6 +494,28 @@ class AdminServices extends config {
         }
     }
 
+    // UPDATE INCIDENT
+    public function updateBrgyLocation($locID, $location_name) {
+        try {
+            // Begin the transaction
+            $this->pdo->beginTransaction();
+                $table_incident_location_query = "UPDATE `tbl_incident_location` SET `location_name`=:location_name WHERE locationID=:locationID";
+                $stmt1 = $this->pdo->prepare($table_incident_location_query);
+                $stmt1->bindParam(':locationID', $locID);
+                $stmt1->bindParam(':location_name', $location_name);
+                $stmt1->execute();
+            // Commit the transaction
+            $this->pdo->commit();
+            // Return success
+            return true;
+        } catch (PDOException $e) {
+            // Rollback the transaction in case of error
+            $this->pdo->rollBack();
+            
+            return "Error: " . $e->getMessage();
+        }
+    }
+
     public function deleteIncidentByID($incidentID_fk) {
         try {
             // Debugging
@@ -601,6 +627,19 @@ class AdminServices extends config {
         }
     }
     
+
+    public function reportForMonth() {
+        try {
+            $query = "SELECT `barangay`, `incident_count`, `incident_types` FROM `incident_count_current_month_per_barangay_with_type` WHERE 1";
+            $stmt = $this->pdo->prepare($query); // Prepare the query
+            $stmt->execute(); // Execute the query
+            $locations =  $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch the result
+        
+            return $locations;// Outputs locations as JSON
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+        }
+    }
 
 
 

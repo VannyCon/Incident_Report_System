@@ -14,6 +14,7 @@ $adminService = new AdminServices();
 
 $error_message = '';
 
+
 // Check if this is the "Create Incident" page and the latitude/longitude are provided
 if (isset($_GET['lat']) && isset($_GET['long'])) {
     // Retrieve and sanitize input values
@@ -44,7 +45,8 @@ if (isset($_GET['lat']) && isset($_GET['long'])) {
             }
         }
 
-        
+        $location_name = isset($_POST['location_name']) ? $_POST['location_name'] : null;
+
         $complaint = isset($_POST['complaint']) ? $_POST['complaint'] : null;
         $rescuer_team = isset($_POST['rescuer_team']) ? $_POST['rescuer_team'] : null;
         $referred_hospital = isset($_POST['referred_hospital']) ? $_POST['referred_hospital'] : null;
@@ -69,6 +71,7 @@ if (isset($_GET['lat']) && isset($_GET['long'])) {
             $status = $adminService->createIncident(
                 $latitude,
                 $longitude,
+                $location_name,
                 $patients,
                 $complaint,
                 $rescuer_team,

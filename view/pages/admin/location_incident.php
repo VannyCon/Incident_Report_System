@@ -7,12 +7,26 @@
         $lat = $_GET['lat'];
         $long = $_GET['long'];
         $incidents = $adminService->getAllIncidentByLocId($LocID);
+
+        if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] == 'updateLocName'){
+            $location_name = isset($_POST['location_name']) ? $_POST['location_name'] : null;
+            $status = $adminService->updateBrgyLocation($LocID, $location_name);
+            if($status == true){
+                header("Location: location_incident.php?locID=$locID&lat=$lat&long=$long");
+                exit();
+            }else{
+                header("Location: index.php?error=1");
+            }
+        }
     }
 ?>
 
 <?php require_once('../../components/header.php')?>
 <div class="d-flex justify-content-between mx-5 mt-5">
     <a href="index.php" class="btn btn-outline-danger">Back</a>
+    <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#updateLocationNameModal" data-id="<?= $incident['incidentID_fk'] ?>">
+        Update Location Name
+    </button>
     <a href="create.php?<?php echo "locID=$LocID&lat=$lat&long=$long"; ?>" class="btn btn-warning">Create</a>
 </div>
 
@@ -38,6 +52,10 @@
         </div>
     </div>
 </div>
+
+
+
+
 
 <?php if (!empty($incidents)): ?>
     <?php foreach ($incidents as $incident): ?>
@@ -92,6 +110,7 @@
                         <div class="col-12">
                             <h6 class="card-subtitle mb-2 text-muted">Incident Type</h6>
                             <p class="card-text">
+                                <strong>Incident Location:</strong> <?= $incident['location_name']; ?><br>
                                 <strong>Type of Incident:</strong> <?= $incident['type_of_incident']; ?><br>
                                 <strong>Description:</strong> <?= $incident['incident_description']; ?><br>
                                 <strong>Complaint:</strong> <?= $incident['complaint']; ?><br>
@@ -129,6 +148,60 @@
                 </div>
             </div>
         </div>
+
+
+        <!-- Update Location Name Modal -->
+        <div class="modal fade" id="updateLocationNameModal" tabindex="-1" aria-labelledby="updateLocationNameModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="updateLocationNameModalLabel">Update Location Name</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="mb-3 p-2">
+                    <form id="updateLocationNameForm" method="POST" action="">
+                        <label for="incidentType" class="form-label">Barangay</label>
+                        <select class="form-select" id="incidentType" name="location_name" aria-label="Location">
+                            <option value="Andres Bonifacio" <?= ($incident['location_name'] == 'Andres Bonifacio') ? 'selected' : '' ?>>Andres Bonifacio</option>
+                            <option value="Bato" <?= ($incident['location_name'] == 'Bato') ? 'selected' : '' ?>>Bato</option>
+                            <option value="Baviera" <?= ($incident['location_name'] == 'Baviera') ? 'selected' : '' ?>>Baviera</option>
+                            <option value="Bulanon" <?= ($incident['location_name'] == 'Bulanon') ? 'selected' : '' ?>>Bulanon</option>
+                            <option value="Campo Himoga-an" <?= ($incident['location_name'] == 'Campo Himoga-an') ? 'selected' : '' ?>>Campo Himoga-an</option>
+                            <option value="Campo Santiago" <?= ($incident['location_name'] == 'Campo Santiago') ? 'selected' : '' ?>>Campo Santiago</option>
+                            <option value="Colonia Divina" <?= ($incident['location_name'] == 'Colonia Divina') ? 'selected' : '' ?>>Colonia Divina</option>
+                            <option value="Rafaela Barrera" <?= ($incident['location_name'] == 'Rafaela Barrera') ? 'selected' : '' ?>>Rafaela Barrera</option>
+                            <option value="Fabrica" <?= ($incident['location_name'] == 'Fabrica') ? 'selected' : '' ?>>Fabrica</option>
+                            <option value="General Luna" <?= ($incident['location_name'] == 'General Luna') ? 'selected' : '' ?>>General Luna</option>
+                            <option value="Himoga-an Baybay" <?= ($incident['location_name'] == 'Himoga-an Baybay') ? 'selected' : '' ?>>Himoga-an Baybay</option>
+                            <option value="Lopez Jaena" <?= ($incident['location_name'] == 'Lopez Jaena') ? 'selected' : '' ?>>Lopez Jaena</option>
+                            <option value="Malubon" <?= ($incident['location_name'] == 'Malubon') ? 'selected' : '' ?>>Malubon</option>
+                            <option value="Maquiling" <?= ($incident['location_name'] == 'Maquiling') ? 'selected' : '' ?>>Maquiling</option>
+                            <option value="Molocaboc" <?= ($incident['location_name'] == 'Molocaboc') ? 'selected' : '' ?>>Molocaboc</option>
+                            <option value="Old Sagay" <?= ($incident['location_name'] == 'Old Sagay') ? 'selected' : '' ?>>Old Sagay</option>
+                            <option value="Paraiso" <?= ($incident['location_name'] == 'Paraiso') ? 'selected' : '' ?>>Paraiso</option>
+                            <option value="Plaridel" <?= ($incident['location_name'] == 'Plaridel') ? 'selected' : '' ?>>Plaridel</option>
+                            <option value="Poblacion I (Barangay 1)" <?= ($incident['location_name'] == 'Poblacion I (Barangay 1)') ? 'selected' : '' ?>>Poblacion I (Barangay 1)</option>
+                            <option value="Poblacion II (Barangay 2)" <?= ($incident['location_name'] == 'Poblacion II (Barangay 2)') ? 'selected' : '' ?>>Poblacion II (Barangay 2)</option>
+                            <option value="Puey" <?= ($incident['location_name'] == 'Puey') ? 'selected' : '' ?>>Puey</option>
+                            <option value="Rizal" <?= ($incident['location_name'] == 'Rizal') ? 'selected' : '' ?>>Rizal</option>
+                            <option value="Taba-ao" <?= ($incident['location_name'] == 'Taba-ao') ? 'selected' : '' ?>>Taba-ao</option>
+                            <option value="Tadlong" <?= ($incident['location_name'] == 'Tadlong') ? 'selected' : '' ?>>Tadlong</option>
+                            <option value="Vito" <?= ($incident['location_name'] == 'Vito') ? 'selected' : '' ?>>Vito</option>
+                        </select>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                       
+                            <input type="hidden" name="incidentID" id="incidentID">
+                            <input type="hidden" name="action" value="updateLocName">
+                            <button type="submit" class="btn btn-danger">Update</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
     <?php endforeach; ?>
 <?php else: ?>
     <p>No Incident Found.</p>

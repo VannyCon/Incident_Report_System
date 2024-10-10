@@ -5,6 +5,7 @@ require_once('../../../controller/AdminController.php'); ?>
 <?php require_once('../../components/header.php')?>
 
   <div class="container mt-5">
+    <a href="index.php" class="btn btn-outline-danger">Back</a>
     <h2>Incident Report Form</h2>
     <?php if (!empty($error_message)): ?>
             <div class="alert alert-danger" role="alert">
@@ -22,7 +23,43 @@ require_once('../../../controller/AdminController.php'); ?>
           <option value="isOther">Other Incident</option>
         </select>
       </div>
-
+      <?php 
+        if(!isset($_GET['locID'])){
+          echo " <div class='mb-3'>
+                  <label for='incidentType' class='form-label'>Baranggay</label>
+                  <select class='form-select' id='incidentType' name='location_name' aria-label='Location'>
+                    <option value='Andres Bonifacio'>Andres Bonifacio</option>
+                    <option value='Bato'>Bato</option>
+                    <option value='Baviera'>Baviera</option>
+                    <option value='Bulanon'>Bulanon</option>
+                    <option value='Campo Himoga-an'>Campo Himoga-an</option>
+                    <option value='Campo Santiago'>Campo Santiago</option>
+                    <option value='Colonia Divina'>Colonia Divina</option>
+                    <option value='Rafaela Barrera'>Rafaela Barrera</option>
+                    <option value='Fabrica'>Fabrica</option>
+                    <option value='General Luna'>General Luna</option>
+                    <option value='Himoga-an Baybay'>Himoga-an Baybay</option>
+                    <option value='Lopez Jaena'>Lopez Jaena</option>
+                    <option value='Malubon'>Malubon</option>
+                    <option value='Maquiling'>Maquiling</option>
+                    <option value='Molocaboc'>Molocaboc</option>
+                    <option value='Old Sagay'>Old Sagay</option>
+                    <option value='Paraiso'>Paraiso</option>
+                    <option value='Plaridel'>Plaridel</option>
+                    <option value='Poblacion I (Barangay 1)'>Poblacion I (Barangay 1)</option>
+                    <option value='Poblacion II (Barangay 2)'>Poblacion II (Barangay 2)</option>
+                    <option value='Puey'>Puey</option>
+                    <option value='Rizal'>Rizal</option>
+                    <option value='Taba-ao'>Taba-ao</option>
+                    <option value='Tadlong'>Tadlong</option>
+                    <option value='Vito'>Vito</option>
+                  </select>
+                </div>
+          ";
+        }
+      
+      ?>
+     
       <!-- Common Incident Form Fields -->
 
         <!-- PATIENT INFORMATION -->
