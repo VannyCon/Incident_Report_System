@@ -1,4 +1,6 @@
 <?php
+// To Create PDF
+
 require_once('../../../vendor/autoload.php');
 require_once('../../../controller/AdminController.php'); // Adjust the path as necessary// Instantiate your controller
 $monthDatas = $adminService->reportForMonth(); // Call your method to fetch data

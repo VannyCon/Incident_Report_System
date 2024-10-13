@@ -1,4 +1,6 @@
 <?php 
+
+// SHOW ALL THE INCIDENT TO USER WHICH LIMITED ONLY
     $title = "LocationIncident";
     include_once('../../../controller/UserController.php');
 

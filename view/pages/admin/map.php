@@ -1,6 +1,9 @@
 <?php
 $title = "admin";
 session_start();
+
+//DISPLAY ALL THE INCIDENT IN MAP
+
 // Redirect to login if not logged in
 if (!isset($_SESSION['username'])) {
     header("Location: ../../../index.php");

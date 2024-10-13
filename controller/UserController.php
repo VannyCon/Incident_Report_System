@@ -2,6 +2,6 @@
 session_start();
 
 require_once('../../../services/AdminService.php');
-// Instantiate the class
+// Instantiate this class form User
 $adminService = new AdminServices();
 ?>

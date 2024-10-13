@@ -1,7 +1,6 @@
 <?php 
     include_once('../../../controller/LogoutController.php');
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,6 +19,8 @@
 <body class="px-1 px-md-5" style="background-color: #fffcfc">
 
 <?php 
+
+// LOG OUT BUTTON WILL NOT SHOW IF YOU NOT LOGIN
     // Redirect to login if not logged in
     if (isset($_SESSION['username']) && $title != "User") {
         echo "

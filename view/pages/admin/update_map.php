@@ -1,4 +1,7 @@
 <?php
+
+
+// THIS PART USE IF YOU WANT TO UPDATE THE LOCATION OF THE INCIDENT
 require_once('../../../controller/AdminController.php');
 $title = 'Update';
 if (isset($_GET['incidentID'])) {

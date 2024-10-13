@@ -41,6 +41,8 @@ class config {
         }
         return $data;
     }
+
+    // remove the seasion so it will redirect the user to login
     function logout(){
         session_start();
         // Unset all session variables

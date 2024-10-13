@@ -4,6 +4,7 @@ require_once("../../../connection/connection.php");
 
 class AdminServices extends config {
 
+    //THis part get All the Incident which pass to map for Mapping
     public function getAllIncident() {
         try {
             $query = "SELECT `locationID_fk`, `location_count`, `latitude`, `longitude` FROM `map_incident_cases` WHERE 1";
@@ -17,6 +18,7 @@ class AdminServices extends config {
         }
     }
 
+    // Get all the information of the Specific Location this function need $LocID
     public function getAllIncidentByLocId($LocID) {
         try {
             $query = "SELECT 
@@ -140,6 +142,7 @@ class AdminServices extends config {
     }
     
     
+    // Get all the information of the Specific incident this function need $incidentID
     public function getIncidentById($incidentID) {
         try {
             $query = "SELECT 
@@ -186,7 +189,7 @@ class AdminServices extends config {
         }
     }
 
-        
+    // This part get all the patient information usiong IncidentID
     public function getIncidentPatientsById($incidentID) {
         try {
             $query = "SELECT `id`, `incidentID_fk`, `patientID`, `statusID`, `patient_name`, `patient_birthdate`, `patient_age`, `patient_sex`, `patient_address` FROM `tbl_patient_info` WHERE incidentID_fk = :incidentID";
@@ -204,6 +207,7 @@ class AdminServices extends config {
         }
     }
 
+    // Function to generate unique patient ID
     function generatePatientID() {
         // Prefix (optional) for the patient ID (e.g., "patient-")
         $prefix = "PID-";
@@ -224,6 +228,7 @@ class AdminServices extends config {
         return $prefix . strtoupper($patientID);
     }
 
+    // Function to generate unique location ID
     function generateLocationID() {
         // Prefix (optional) for the patient ID (e.g., "patient-")
         $prefix = "LID-";
@@ -244,6 +249,7 @@ class AdminServices extends config {
         return $prefix . strtoupper($patientID);
     }
 
+    // Generate Custome Status ID
     function generateStatusID() {
         // Prefix (optional) for the patient ID (e.g., "patient-")
         $prefix = "SID-";
@@ -264,6 +270,7 @@ class AdminServices extends config {
         return $prefix . strtoupper($patientID);
     }
 
+    // Generate Custome Incident ID
     function generateIncidentID() {
         // Prefix (optional) for the patient ID (e.g., "patient-")
         $prefix = "IID-";
@@ -312,10 +319,13 @@ class AdminServices extends config {
             // Begin the transaction
             $this->pdo->beginTransaction();
             $patientID = $this->generatePatientID();
+
+            // IF Location is Not Null its mean location is already exist you want just to create then thsi will run
             if($locID != null){
                 $locationID = $locID;
                 // Execute the fourth query
             }else{
+                //if The Location is not exist yet then this will run which mean it will create new location and User Custome LocID
                 $locationID = $this->generateLocationID();
                 $table_incident_location_query = "INSERT INTO `tbl_incident_location`(`locationID`,`location_name`, `latitude`, `longitude`) VALUES (:locationID,:location_name, :latitude, :longitude)";
                 $stmt1 = $this->pdo->prepare($table_incident_location_query);
@@ -342,8 +352,9 @@ class AdminServices extends config {
             $stmt3->execute();
 
 
-                        //INSERT HERE ALL THE Patient
+            //INSERT HERE ALL THE Patient
             // Insert each patient data
+            //This Part Pass Array which can Insert Multiple Data Patient Data
             foreach ($patients as $patient) {
                 $patientID = $this->generatePatientID();  // Generate unique patientID for each patient
                 // Insert patient info
@@ -360,6 +371,7 @@ class AdminServices extends config {
                 $stmt2->execute();
             }
 
+            // Insert Insert type of incident
             $type_of_incident_query = "INSERT INTO `tbl_type_incident`(`incidentID`, `isVehiclular`, `type_of_incident`, `description`) VALUES (:incidentID,:isVehiclular ,:type_of_incident, :description)";
             $stmt4 = $this->pdo->prepare($type_of_incident_query);
             $stmt4->bindParam(':incidentID', $incidentID);
@@ -369,6 +381,7 @@ class AdminServices extends config {
             // Execute the fourth query
             $stmt4->execute();
 
+            // If the Incident is Vehiculalar then this will run else it wont create tbl_vehicular_incident
             if($isVehiclular){  
                 $va_incident_query = "INSERT INTO `tbl_vehicular_incident`(`incidentID`, `patient_classification`, `vehicle_type`, `intoxication`, `helmet`, `stray`) VALUES (:incidentID, :patient_classification, :vehicle_type, :intoxication, :helmet, :stray)";
                 $stmt5 = $this->pdo->prepare($va_incident_query);
@@ -395,6 +408,7 @@ class AdminServices extends config {
         }
     }
 
+    // UPDATE PATIENT
     public function updateIncident( 
         $incidentID_fk,
         $latitude, 
@@ -417,11 +431,12 @@ class AdminServices extends config {
         try {
             // Begin the transaction
             $this->pdo->beginTransaction();
-            
+             // IF Location is Not Null its mean location is already exist you want just to create then thsi will run
             if ($locID != null) {
                 $locationID = $locID;
                 // Execute the fourth query
             } else {
+                 //if The Location is not exist yet then this will run which mean it will create new location and User Custome LocID
                 $locationID = $this->generateLocationID();
                 $table_incident_location_query = "INSERT INTO `tbl_incident_location`(`locationID`, `latitude`, `longitude`) VALUES (:locationID, :latitude, :longitude)";
                 $stmt1 = $this->pdo->prepare($table_incident_location_query);
@@ -431,7 +446,7 @@ class AdminServices extends config {
                 $stmt1->execute();
             }
     
-            // Insert or update each patient data
+            //This Part Pass Array which can Insert Multiple Data Patient Data
             foreach ($patients as $patient) {
                 // Check if the patient exists in the database
                 $check_patient_query = "SELECT COUNT(*) FROM `tbl_patient_info` WHERE `patientID` = :patientID";
@@ -440,7 +455,7 @@ class AdminServices extends config {
                 $stmt_check->execute();
                 
                 $exists = $stmt_check->fetchColumn() > 0;
-    
+                // IF patient is already exist then it will just update else it will create
                 if ($exists) {
                     // Update patient info
                     $update_patient_info_query = "UPDATE `tbl_patient_info` SET `statusID` = :statusID, `patient_name` = :patient_name, `patient_birthdate` = :patient_birthdate, `patient_age` = :patient_age, `patient_sex` = :patient_sex, `patient_address` = :patient_address WHERE `patientID` = :patientID";
@@ -500,7 +515,8 @@ class AdminServices extends config {
                 $stmt_check_incident->execute();
     
                 $exists = $stmt_check_incident->fetchColumn() > 0;
-    
+                
+                // This part if the Incident Vehiclular is then check if the Incident Is already then if exist then it will just UPDATE else if not exist then CREATE
                 if ($exists) {
                     $update_vehicular_incident_query = "UPDATE `tbl_vehicular_incident` SET `patient_classification` = :patient_classification, `vehicle_type` = :vehicle_type, `intoxication` = :intoxication, `helmet` = :helmet, `stray` = :stray WHERE `incidentID` = :incidentID";
                     $stmt5 = $this->pdo->prepare($update_vehicular_incident_query);
@@ -539,7 +555,7 @@ class AdminServices extends config {
     }
     
 
-    // UPDATE INCIDENT
+    // UPDATE INCIDENT LOCATION NAME
     public function updateBrgyLocation($locID, $location_name) {
         try {
             // Begin the transaction
@@ -561,6 +577,7 @@ class AdminServices extends config {
         }
     }
 
+    //DELETE INCIDENT
     public function deleteIncidentByID($incidentID_fk) {
         try {
             // Debugging
@@ -590,7 +607,7 @@ class AdminServices extends config {
     
 
 
-
+    //GET ALL THE INCIDENT
     public function getAllIncidentInfo() {
         try {
             // SQL query with joins and conditional logic
@@ -673,7 +690,7 @@ class AdminServices extends config {
         }
     }
     
-
+    
     public function reportForMonth() {
         try {
             $query = "SELECT `barangay`, `incident_count`, `incident_types` FROM `incident_count_current_month_per_barangay_with_type` WHERE 1";

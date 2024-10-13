@@ -2,6 +2,8 @@
     $title = "LocationIncident";
     include_once('../../../controller/AdminController.php');
 
+
+    //YOU WILL FIND HERE THE INFORMATION OF THE LOCATION INCIDENT IF HOW MANY ACCESS ON THE SPECIFC AREA
     if (isset($_GET['locID']) && isset($_GET['lat']) && isset($_GET['long'])) {  // Change 'LocID' to 'locID'
         $LocID = $_GET['locID'];
         $lat = $_GET['lat'];
@@ -52,8 +54,6 @@
         </div>
     </div>
 </div>
-
-
 
 
 

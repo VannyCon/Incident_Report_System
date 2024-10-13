@@ -4,6 +4,7 @@ require_once("../../../connection/connection.php");
 
 class DashboardServices extends config {
 
+    // The Data GET here is pass to Died, Fatal, Major & Minor
     public function totalInjuries() {
         try {
             $query = "SELECT `minor`, `major`, `fatal`, `died` FROM `total_of_injuries` WHERE 1";
@@ -16,7 +17,7 @@ class DashboardServices extends config {
             echo "Error: " . $e->getMessage();
         }
     }
-    
+        // The Data GET here is pass to Table
     public function topThreeIncident() {
         try {
             $query = "SELECT `type_of_incident`, `total_cases` FROM `top_three_incidents` WHERE 1";
@@ -29,7 +30,7 @@ class DashboardServices extends config {
             echo "Error: " . $e->getMessage();
         }
     }
-    
+    // The Data GET here is pass to Monthly Graph
     public function monthlyAnalytic() {
         try {
             $query = "SELECT `month_name`, `incident_count` FROM `month_analytics` WHERE 1";
@@ -42,7 +43,7 @@ class DashboardServices extends config {
             echo "Error: " . $e->getMessage();
         }
     }
-
+    // The Data GET here is pass to Yearly Graph
     public function yearAnalytic() {
         try {
             $query = "SELECT `incident_year`, `incident_count` FROM `past_year_analytics` WHERE 1";

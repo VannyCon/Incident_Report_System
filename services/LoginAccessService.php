@@ -4,9 +4,14 @@ require_once("connection/connection.php");
 
 
 class LoginAccess extends config {
+
+    //This is the Function use to LOGIN
     public function login($username, $password){
         try {
             // Prepare and execute query to get user by username
+            // If user exists and password is correct, start a session and redirect to protected page.
+            // Otherwise, display an error message.
+            // This is a basic example and should be replaced with more secure and robust methods.
             $query = "SELECT * FROM tbl_admin_access WHERE username = :username";
             $stmt = $this->pdo->prepare($query);
             $stmt->bindParam(':username', $username);

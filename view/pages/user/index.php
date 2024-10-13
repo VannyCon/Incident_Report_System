@@ -4,7 +4,7 @@ require_once('../../components/header.php')?>
 <div class="my-3">
 
     <h3 class="ms-2"><strong>Incident Map</strong></h3>
-    <div id="map" style="height: 500px;"></div> <!-- Set a height for the map -->
+    <div id="map" style="height: 500px; margin: 5px"></div> <!-- Set a height for the map -->
     <div class="m-3">
         <p>Red <img src="../../../assets/images/red_marker.png" alt="" srcset="" width="20"> High Risk</p>
         <p>Yellow <img src="../../../assets/images/yellow_marker.png" alt="" srcset="" width="20"> Medium Risk</p>

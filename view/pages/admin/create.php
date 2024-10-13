@@ -24,6 +24,8 @@ require_once('../../../controller/AdminController.php'); ?>
         </select>
       </div>
       <?php 
+      // if Incident Location is already exist you wont see this Navigation else if New location then this will show
+
         if(!isset($_GET['locID'])){
           echo " <div class='mb-3'>
                   <label for='incidentType' class='form-label'>Baranggay</label>
@@ -210,6 +212,8 @@ require_once('../../../controller/AdminController.php'); ?>
         newForm.setAttribute('id', formId);
 
         // Add the new form fields with a delete button
+
+        // This is the JS use to Create New Patient FOrm
         newForm.innerHTML = `
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h4>${ordinal(patientCount)} Patient Information</h4>

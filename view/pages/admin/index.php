@@ -8,8 +8,9 @@ if (!isset($_SESSION['username'])) {
     exit();
 }
 $dashboard = new DashboardServices();
-
+// Get DIED,FATAL, MAJOR AND MINOR
 $toalInjuries = $dashboard->totalInjuries();
+// GET ALL TOP INCEDENT TYPE
 $topInjuries= $dashboard->topThreeIncident();
 $m = $dashboard->monthlyAnalytic();
 // Initialize the monthly data with zero counts
@@ -25,7 +26,7 @@ if (!empty($m)) {
     }
 }
 
-
+// Get Year Analytics
 $y = $dashboard->yearAnalytic();
 
 
