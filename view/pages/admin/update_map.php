@@ -103,5 +103,23 @@ if (isset($_GET['incidentID'])) {
                 .setContent(popupContent)
                 .openOn(map);
         });
+
+        fetch('sagay_city_geojson.php')
+        .then(response => response.json())
+        .then(geoData => {
+            // Define a style for the GeoJSON layer
+            const geoJsonStyle = {
+                color: 'blue', // Outline color
+                fillColor: 'lightblue', // Fill color
+                fillOpacity: 0.2, // Fill opacity (0.0 to 1.0)
+                weight: 2 // Outline weight
+            };
+
+            // Add the GeoJSON layer to the map with the specified style
+            L.geoJSON(geoData, { style: geoJsonStyle }).addTo(map);
+        })
+        .catch(error => {
+            console.error('Error fetching GeoJSON data:', error);
+        });
     </script>
 <?php require_once('../../components/footer.php')?>

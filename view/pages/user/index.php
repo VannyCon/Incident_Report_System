@@ -6,10 +6,10 @@ require_once('../../components/header.php')?>
     <h3 class="ms-2"><strong>Incident Map</strong></h3>
     <div id="map" style="height: 500px; margin: 5px"></div> <!-- Set a height for the map -->
     <div class="m-3">
-        <p>Red <img src="../../../assets/images/red_marker.png" alt="" srcset="" width="20"> High Risk</p>
-        <p>Yellow <img src="../../../assets/images/yellow_marker.png" alt="" srcset="" width="20"> Medium Risk</p>
-        <p>Blue <img src="../../../assets/images/blue_marker.png" alt="" srcset="" width="20"> Low Risk</p>
-        <p>Green <img src="../../../assets/images/green_marker.png" alt="" srcset="" width="20"> User Location</p> <!-- Added green marker description -->
+        <p>Red <img src="../../../assets/images/red_marker.png" alt="" width="20"> High Risk</p>
+        <p>Yellow <img src="../../../assets/images/yellow_marker.png" alt="" width="20"> Medium Risk</p>
+        <p>Blue <img src="../../../assets/images/blue_marker.png" alt="" width="20"> Low Risk</p>
+        <p>Green <img src="../../../assets/images/green_marker.png" alt="" width="20"> User Location</p> <!-- Added green marker description -->
     </div>
 </div>
 
@@ -125,6 +125,25 @@ require_once('../../components/header.php')?>
 
     // Get user's location when the page loads
     window.onload = getUserLocation;
+
+    // Fetch the GeoJSON data from the separate file
+    fetch('sagay_city_geojson.php')
+        .then(response => response.json())
+        .then(geoData => {
+            // Define a style for the GeoJSON layer
+            const geoJsonStyle = {
+                color: 'blue', // Outline color
+                fillColor: 'lightblue', // Fill color
+                fillOpacity: 0.2, // Fill opacity (0.0 to 1.0)
+                weight: 2 // Outline weight
+            };
+
+            // Add the GeoJSON layer to the map with the specified style
+            L.geoJSON(geoData, { style: geoJsonStyle }).addTo(map);
+        })
+        .catch(error => {
+            console.error('Error fetching GeoJSON data:', error);
+        });
 </script>
 
 <?php require_once('../../components/footer.php')?>
