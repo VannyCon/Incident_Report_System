@@ -113,37 +113,58 @@ if (isset($_GET['lat']) && isset($_GET['long'])) {
         }else if( $_POST['action'] == 'updateIncident'){
             if(isset($_POST['incidentID_fk'])){
                 $incidentID_fk = $_POST['incidentID_fk'];
-            }else{
-                header("Location: update.php??PatientID=$patientID&locID=$locID&lat=$lat&long=$long");
-                exit();
-            }
-            $status = $adminService->updateIncident( 
-                $incidentID_fk,
-                $latitude, 
-                $longitude, 
-                $patients,
-                $complaint, 
-                $rescuer_team, 
-                $referred_hospital, 
-                $incident_date, 
-                $isVehiclular, 
-                $patient_classification, 
-                $vehicle_type, 
-                $intoxication, 
-                $helmet, 
-                $stray, 
-                $type_of_incident, 
-                $description,
-                $locID
-            );
+                 // Use $_POST for latitude and longitude if the form is submitted via POST
+                $latitude = $_GET['lat'] ?? null;
+                $longitude = $_GET['long'] ?? null;
 
-            if ($status === true) {
-                // Redirect to map.php after success
-                header("Location: location_incident.php?locID=$locID&lat=$latitude&long=$longitude");
+                
+                // if Loc ID is already exist then it will use that since the location is already exist else throw null because if null the $locID then the Service create new location.
+                if(isset($_GET['locID'])){
+                    $locID = $_GET['locID'];
+                }else{
+                    $locID = null;
+                }
+
+                  // Validate that required data is set
+                if ($latitude && $longitude && $incidentID_fk) {
+                    // Call the updateIncident service
+                    $status = $adminService->updateIncident(
+                        $incidentID_fk,
+                        $latitude,
+                        $longitude,
+                        $patients,
+                        $complaint,
+                        $rescuer_team,
+                        $referred_hospital,
+                        $incident_date,
+                        $isVehiclular,
+                        $patient_classification,
+                        $vehicle_type,
+                        $intoxication,
+                        $helmet,
+                        $stray,
+                        $type_of_incident,
+                        $description,
+                        $locID
+                    );
+
+                    if ($status[0] == true) {
+                        // Redirect to location_incident.php with parameters
+                        header("Location: location_incident.php?locID={$status[1]}&lat={$status[2]}&long={$status[3]}");
+                    } else {
+                        $error_message = $status;
+                    }
+                } else {
+                    $error_message = "Error: Missing required fields.";
+                }
+
+
+            }else{
+                header("Location: update.php?IncidentID=$incidentID_fk&locID=$locID&lat=$lat&long=$long");
                 exit();
-            } else {
-                $error_message = $status;
             }
+
+
         }      
         // If Action is deleteIncident , this located to FORM           
         // <input type="hidden" name="action" value="deleteIncident">

@@ -1,4 +1,5 @@
 <?php
+
 require_once('../../../controller/AdminController.php');
 
 $title = 'Update';
@@ -7,7 +8,7 @@ $title = 'Update';
 if (isset($_GET['IncidentID'])) {
     $incidentID = $_GET['IncidentID'];
 } else {
-    header("Location: index.php");
+    header("Location: map.php");
     exit();
 }
 
@@ -26,7 +27,7 @@ if (isset($incidentData['patients'])) {
     foreach ($incidentData['patients'] as $patient) {
         $patients[] = [
             'name' => $patient['name'],
-            'age' => $patient['patient_birthdate'],
+            'patient_birthdate' => $patient['patient_birthdate'],
             'age' => $patient['age'],
             'sex' => $patient['sex'],
             'address' => $patient['address'],
@@ -49,8 +50,7 @@ if (isset($incidentData['patients'])) {
     <?php endif; ?>
 
     <form action="" method="POST">
-        <a href="update_map.php?incidentID=<?php echo htmlspecialchars($incidentID); ?>" class="btn btn-info text-white my-2">Change Location?</a>
-        
+        <a href="update_map.php?IncidentID=<?php echo htmlspecialchars($incidentID); ?>" class="btn btn-info text-white my-2">Change Location?</a>
         <!-- Select Incident Type -->
         <div class="mb-3">
             <label for="incidentType" class="form-label">Select Incident Type</label>
@@ -60,6 +60,8 @@ if (isset($incidentData['patients'])) {
                 <option value="isOther" <?php echo (isset($incidentData['isVehiclular']) && $incidentData['isVehiclular'] == false) ? 'selected' : ''; ?>>Other Incident</option>
             </select>
         </div>
+        <!-- <input type="text" name="lat" id="" value="<?php echo $_GET['lat']?>">
+        <input type="text" name="long" id="" value="<?php echo $_GET['long']?>"> -->
         <input type="hidden" class="form-control" id="incidentID_fk" name="incidentID_fk" value="<?php echo htmlspecialchars($incidentData['incidentID_fk']); ?>" required>
         <?php
             // Define the ordinal function in PHP

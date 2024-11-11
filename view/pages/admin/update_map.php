@@ -4,8 +4,8 @@
 // THIS PART USE IF YOU WANT TO UPDATE THE LOCATION OF THE INCIDENT
 require_once('../../../controller/AdminController.php');
 $title = 'Update';
-if (isset($_GET['incidentID'])) {
-    $incidentID = $_GET['incidentID'];
+if (isset($_GET['IncidentID'])) {
+    $incidentID = $_GET['IncidentID'];
 }else{
     header("Location: map.php");
     exit();
@@ -70,7 +70,7 @@ if (isset($_GET['incidentID'])) {
                     L.marker([lat, lng], { icon: icon }).addTo(map)
                         .bindPopup(`<div>
                             <strong>Incident Cases:</strong> ${cases}<br>
-                            <a class="btn btn-info w-100 text-white" href="update.php?incidentID=<?php echo $incidentID ?>&locID=${locID}&lat=${lat}&long=${lng}")">Select this Location</a>
+                            <a class="btn btn-info w-100 text-white" href="update.php?IncidentID=<?php echo $incidentID ?>&locID=${locID}&lat=${lat}&long=${lng}")">Select this Location</a>
                         </div>`);
                 });
             })
@@ -81,7 +81,7 @@ if (isset($_GET['incidentID'])) {
         // Function to handle confirming a location and redirecting to create.php
         function confirmLocation(lat, lng) {
             // Redirect to create.php with latitude and longitude as URL parameters
-            window.location.href = `update.php?incidentID=<?php echo $incidentID ?>&lat=${lat}&long=${lng}`;
+            window.location.href = `update.php?IncidentID=<?php echo $incidentID ?>&lat=${lat}&long=${lng}`;
         }
 
 

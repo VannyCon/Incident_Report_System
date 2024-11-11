@@ -1,4 +1,5 @@
 <?php 
+ob_start();
 class config {
     public $pdo; // Declare $pdo as a class property
 

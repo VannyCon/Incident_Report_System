@@ -544,7 +544,7 @@ class AdminServices extends config {
             $this->pdo->commit();
     
             // Return success
-            return true;
+            return [true, $locationID, $latitude, $longitude];
     
         } catch (PDOException $e) {
             // Rollback the transaction in case of error
