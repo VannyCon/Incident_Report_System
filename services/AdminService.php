@@ -296,7 +296,7 @@ class AdminServices extends config {
 
 
     // CREATE PATIENT
-    public function createIncident( 
+    public function createIncident(
         $latitude, 
         $longitude,
         $location_name, 
@@ -339,7 +339,6 @@ class AdminServices extends config {
             $incidentID = $this->generateIncidentID();
 
             $incident_query = "INSERT INTO `tbl_incident`(`locationID_fk`, `incidentID_fk`, `complaint`, `rescuer_team`, `referred_hospital`, `incident_date`) VALUES (:locationID_fk, :incidentID_fk, :complaint, :rescuer_team, :referred_hospital, :incident_date)";
-
             $stmt3 = $this->pdo->prepare($incident_query);
             $stmt3->bindParam(':locationID_fk', $locationID);
             $stmt3->bindParam(':incidentID_fk', $incidentID);
@@ -353,7 +352,6 @@ class AdminServices extends config {
 
 
             //INSERT HERE ALL THE Patient
-            // Insert each patient data
             //This Part Pass Array which can Insert Multiple Data Patient Data
             foreach ($patients as $patient) {
                 $patientID = $this->generatePatientID();  // Generate unique patientID for each patient
@@ -391,9 +389,10 @@ class AdminServices extends config {
                 $stmt5->bindParam(':intoxication', $intoxication);
                 $stmt5->bindParam(':helmet', $helmet);
                 $stmt5->bindParam(':stray', $stray);
-                // Execute the fourth query
+                // Execute the fifth query
                 $stmt5->execute();
             }
+
             // Commit the transaction
             $this->pdo->commit();
 

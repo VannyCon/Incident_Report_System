@@ -95,7 +95,7 @@ if (isset($_GET['IncidentID'])) {
                 <div>
                     <p>Don't have Case Here!</p>
                     <button class="btn btn-warning w-100" onclick="confirmLocation(${lat}, ${lng})">Select this Location</button>
-                </div>
+                </div>  
             `;
 
             L.popup()

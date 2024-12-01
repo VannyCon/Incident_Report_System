@@ -126,8 +126,18 @@
                                     <strong>Patient Classification:</strong> <?= $incident['patient_classification']; ?><br>
                                     <strong>Vehicle Type:</strong> <?= $incident['vehicle_type']; ?><br>
                                     <strong>Intoxication:</strong> <?= $incident['intoxication']; ?><br>
-                                    <strong>Helmet:</strong> <?= $incident['helmet']; ?><br>
-                                    <strong>Stray:</strong> <?= $incident['stray']; ?>
+                                    <strong>Helmet:</strong> 
+                                    <?php if($incident['helmet'] == 1){
+                                        echo "Yes";
+                                    }else{
+                                        echo "No";
+                                    }; ?><br>
+                                    <strong>Stray:</strong> 
+                                    <?php if($incident['stray'] == 1){
+                                        echo "Yes";
+                                    }else{
+                                        echo "No";
+                                    }; ?>
                                 </p>
                             <?php endif; ?>
                         </div>

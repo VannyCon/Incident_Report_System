@@ -158,7 +158,7 @@ require_once('../../components/header.php')?>
             data: {
                 labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                 datasets: [{
-                    label: 'Nursery Plant Summary',
+                    label: 'Incident Summary',
                     data: [Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec],
                     backgroundColor: 'rgba(224, 9, 9, 0.2)',  
                     borderColor: 'rgba(224, 9, 9, 1)',  
