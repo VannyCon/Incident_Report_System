@@ -56,10 +56,12 @@ if (isset($_GET['lat']) && isset($_GET['long'])) {
 
         // This are the things pass to database to create a Info ALL POST on this part is shared so its mean Create Function and Update Function Use $_POST since they have a same argument also to Perform DRY Principle
         $location_name = isset($_POST['location_name']) ? $_POST['location_name'] : null;
+        $location_purok = isset($_POST['location_purok']) ? $_POST['location_purok'] : null;
         $complaint = isset($_POST['complaint']) ? $_POST['complaint'] : null;
         $rescuer_team = isset($_POST['rescuer_team']) ? $_POST['rescuer_team'] : null;
         $referred_hospital = isset($_POST['referred_hospital']) ? $_POST['referred_hospital'] : null;
         $incident_date = isset($_POST['incident_date']) ? $_POST['incident_date'] : null;
+        $incident_time = isset($_POST['incident_time']) ? $_POST['incident_time'] : null;
 
         // For vehicular incidents
         $isVehiclular = isset($_POST['incident_type']) && $_POST['incident_type'] === 'isVehiclular';
@@ -70,7 +72,7 @@ if (isset($_GET['lat']) && isset($_GET['long'])) {
         $stray = $isVehiclular ? (isset($_POST['stray']) ? $_POST['stray'] : null) : null;
 
         // For other types of incidents
-        $type_of_incident = !$isVehiclular ? (isset($_POST['type_of_incident']) ? $_POST['type_of_incident'] : null) : $_POST['va_type_of_incident'];
+        $type_of_incident = !$isVehiclular ? (isset($_POST['incident_type']) ? $_POST['incident_type'] : null) : "Vechicular Incident";
         $description = !$isVehiclular ? (isset($_POST['description']) ? $_POST['description'] : null) : $_POST['va_description'];
 
 
@@ -83,11 +85,13 @@ if (isset($_GET['lat']) && isset($_GET['long'])) {
                 $latitude,
                 $longitude,
                 $location_name,
+                $location_purok,
                 $patients,
                 $complaint,
                 $rescuer_team,
                 $referred_hospital,
                 $incident_date,
+                $incident_time,
                 $isVehiclular,
                 $patient_classification,
                 $vehicle_type,
@@ -116,11 +120,13 @@ if (isset($_GET['lat']) && isset($_GET['long'])) {
                  // Use $_POST for latitude and longitude if the form is submitted via POST
                 $latitude = $_GET['lat'] ?? null;
                 $longitude = $_GET['long'] ?? null;
-
+                $locName = $_GET['locName'];
+                $locPurok = $_GET['locPurok'];
                 
                 // if Loc ID is already exist then it will use that since the location is already exist else throw null because if null the $locID then the Service create new location.
                 if(isset($_GET['locID'])){
                     $locID = $_GET['locID'];
+                    
                 }else{
                     $locID = null;
                 }
@@ -137,6 +143,7 @@ if (isset($_GET['lat']) && isset($_GET['long'])) {
                         $rescuer_team,
                         $referred_hospital,
                         $incident_date,
+                        $incident_time,
                         $isVehiclular,
                         $patient_classification,
                         $vehicle_type,
@@ -150,7 +157,7 @@ if (isset($_GET['lat']) && isset($_GET['long'])) {
 
                     if ($status[0] == true) {
                         // Redirect to location_incident.php with parameters
-                        header("Location: location_incident.php?locID={$status[1]}&lat={$status[2]}&long={$status[3]}");
+                        header("Location: location_incident.php?locID={$status[1]}&lat={$status[2]}&long={$status[3]}&locName={$locName}&locPurok={$locPurok}");
                     } else {
                         $error_message = $status;
                     }

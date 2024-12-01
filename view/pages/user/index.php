@@ -54,35 +54,38 @@ require_once('../../components/header.php')?>
 
     // Fetch GPS locations from the database
     fetch('incident_cases_json.php')
-        .then(response => response.json())
-        .then(data => {
-            data.forEach(location => {
-                var lat = parseFloat(location.latitude);
-                var lng = parseFloat(location.longitude);
-                var locID = location.locationID_fk;
-                var cases = parseInt(location.location_count);
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(location => {
+                    var lat = parseFloat(location.latitude);
+                    var lng = parseFloat(location.longitude);
+                    var locID = location.locationID_fk;
+                    var location_name = location.location_name;
+                    var location_purok = location.location_purok;
+                    var cases = parseInt(location.location_count);
 
-                // Select the appropriate icon based on case count
-                var icon;
-                if (cases === 1) {
-                    icon = blueIcon;
-                } else if (cases === 2) {
-                    icon = yellowIcon;
-                } else if (cases >= 3) {
-                    icon = redIcon;
-                }
+                    // Select the appropriate icon based on case count
+                    var icon;
+                    if (cases === 1) {
+                        icon = blueIcon;
+                    } else if (cases === 2) {
+                        icon = yellowIcon;
+                    } else if (cases >= 3) {
+                        icon = redIcon;
+                    }
 
-                // Add marker with popup
-                L.marker([lat, lng], { icon: icon }).addTo(map)
-                    .bindPopup(`<div>
-                        <strong>Incident Cases:</strong> ${cases}<br>
-                        <a class="btn btn-primary w-100 text-white" href="location_incident.php?locID=${locID}&lat=${lat}&long=${lng}">Check</a>
-                    </div>`);
+                    // Add marker with popup
+                    L.marker([lat, lng], { icon: icon }).addTo(map)
+                        .bindPopup(`<div>
+                            <strong>Incident Cases:</strong> ${cases}<br>
+                            <a class="btn btn-primary w-100 text-white" href="location_incident.php?locID=${locID}&lat=${lat}&long=${lng}&locName=${location_name}&locPurok=${location_purok}")">${location_name}</a>
+                        </div>`);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching GPS data:', error);
             });
-        })
-        .catch(error => {
-            console.error('Error fetching GPS data:', error);
-        });
+
 
     // Function to get user's current location
     function getUserLocation() {

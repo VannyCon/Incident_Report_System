@@ -1,7 +1,6 @@
 <?php 
-
+$title = "User";
 // SHOW ALL THE INCIDENT TO USER WHICH LIMITED ONLY
-    $title = "LocationIncident";
     include_once('../../../controller/UserController.php');
 
     if (isset($_GET['locID']) && isset($_GET['lat']) && isset($_GET['long'])) {  // Change 'LocID' to 'locID'
@@ -17,56 +16,62 @@
     <a href="index.php" class="btn btn-outline-danger">Back</a>
 </div>
 
+<div class="container mt-4">
+
+        <div class="card">
+            <div class="card-header bg-success">
+                <div class="d-flex justify-content-between">
+                    <h5 class="card-title text-white"><?php echo htmlspecialchars($_GET['locName']); ?></h5>
+                </div>
+                
+            </div>
+            <div class="card-body">
+                <p><strong>Purok: </strong><?php echo htmlspecialchars($_GET['locPurok']); ?> </p>
+                <p><strong>Incident Count:</strong> 
+                <?php 
+                if (!empty($incidents)): 
+                    // Remove duplicates and count incidents.
+                    $uniqueIncidentIds = [];
+                    foreach ($incidents as $incident) {
+                        if (!in_array($incident['incident_id'], $uniqueIncidentIds)) {
+                            $uniqueIncidentIds[] = $incident['incident_id'];
+                        }
+                    }
+                    // Display the count of unique incidents.
+                    echo count($uniqueIncidentIds);
+                else: 
+                    echo "No Incident Found.";
+                    header("Location: index.php");
+                    exit();
+                endif; 
+                ?>
+                </p>
+               
+            </div>
+        </div>
+
+
+    </div>
 
 <?php if (!empty($incidents)): ?>
     <?php foreach ($incidents as $incident): ?>
         <div class="container mt-4">
             <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title">Incident Detail</h5>
+                <div class="card-header bg-primary">
+                    <p class="card-title text-white"><strong>Date & Time: </strong>
+                        <?php
+                            $date = $incident['incident_date']; // The date from your data
+                            $formattedDate = date("F j, Y", strtotime($date)); // Convert to 'October 7, 2024'
+                            echo $formattedDate; // Output the formatted date
+                        ?>
+                        <?php
+                            $time = $incident['incident_time']; // The date from your data
+                            $formattedTime = date("g:i a", strtotime($time)); // Convert to '12:45 PM'
+                            echo $formattedTime; // Output the formatted date
+                        ?>
+                    </p>
                 </div>
                 <div class="card-body row">
-                    <div class="col col-12 my-3">
-                        
-                        <!-- Loop through each patient info -->
-                        <?php 
-                        // Initialize a patient counter
-                        $patientCounter = 1; 
-
-                        // Assuming each incident can have multiple patients, looping through patient info
-                        foreach ($incident['patients'] as $patient): ?>
-                            <div class="card mb-3">
-                                <div class="card-header">
-                                    <h6 class="text-muted"><?= $patientCounter ?>st Patient Information</h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col col-md-6"> 
-                                            <!-- Display Patient Information -->
-                                            <p class="card-text">
-                                                <strong>Patient Name:</strong> <?= $patient['patient_name']; ?><br>
-                                                <strong>Age:</strong> <?= $patient['patient_age']; ?><br>
-                                                <strong>Sex:</strong> <?= $patient['patient_sex']; ?><br>
-                                                <strong>Address:</strong> <?= $patient['patient_address']; ?>
-                                            </p>
-                                        </div>
-                                        <div class="col col-md-6">
-                                            <h6 class="card-subtitle mb-2 text-muted">Patient Status</h6>
-                                            <p class="card-text">
-                                                <strong>Status Color:</strong> <?= $patient['patient_status_color']; ?><br>
-                                                <strong>Description:</strong> <?= $patient['patient_status_description']; ?>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <?php 
-                            // Increment patient counter
-                            $patientCounter++; 
-                            ?>
-                        <?php endforeach; ?>
-                    </div>
-
                     <div class="row">
                         <div class="col-12">
                             <h6 class="card-subtitle mb-2 text-muted">Incident Type</h6>
@@ -75,7 +80,8 @@
                                 <strong>Description:</strong> <?= $incident['incident_description']; ?><br>
                                 <strong>Complaint:</strong> <?= $incident['complaint']; ?><br>
                                 <strong>Rescuer:</strong> <?= $incident['rescuer_team']; ?><br>
-                                <strong>Referred Hospital:</strong> <?= $incident['referred_hospital']; ?>
+                                <strong>Referred Hospital:</strong> <?= $incident['referred_hospital']; ?> <br>
+                                <strong>Patient Count:</strong> <?php echo count($incident['patients']); ?>
                             </p>
 
                             <?php if ($incident['isVehiclular'] == 1): ?>
@@ -102,13 +108,6 @@
                     </div>
                 </div>
                 <div class="card-footer text-muted">
-                    <p>Incident Date: 
-                        <?php
-                            $date = $incident['incident_date']; // The date from your data
-                            $formattedDate = date("F j, Y", strtotime($date)); // Convert to 'October 7, 2024'
-                            echo $formattedDate; // Output the formatted date
-                        ?>
-                    </p>
                 </div>
             </div>
         </div>

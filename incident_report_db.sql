@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 13, 2024 at 02:07 PM
+-- Generation Time: Dec 01, 2024 at 07:30 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,6 +20,17 @@ SET time_zone = "+00:00";
 --
 -- Database: `incident_report_db`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `incident_counts_by_barangay`
+-- (See below for the actual view)
+--
+CREATE TABLE `incident_counts_by_barangay` (
+`barangay_name` varchar(25)
+,`incident_count` bigint(21)
+);
 
 -- --------------------------------------------------------
 
@@ -43,6 +54,20 @@ CREATE TABLE `incident_count_per_barangay_with_type` (
 `barangay` varchar(255)
 ,`incident_count` bigint(21)
 ,`incident_types` mediumtext
+);
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `incident_data_each_month_this_year`
+-- (See below for the actual view)
+--
+CREATE TABLE `incident_data_each_month_this_year` (
+`barangay` varchar(255)
+,`incident_count` bigint(21)
+,`incident_types` mediumtext
+,`incident_month` int(2)
+,`incident_year` int(4)
 );
 
 -- --------------------------------------------------------
@@ -114,6 +139,7 @@ CREATE TABLE `tbl_incident` (
   `rescuer_team` varchar(100) DEFAULT NULL,
   `referred_hospital` varchar(255) DEFAULT NULL,
   `incident_date` date DEFAULT NULL,
+  `incident_time` time NOT NULL,
   `created_date` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -121,15 +147,15 @@ CREATE TABLE `tbl_incident` (
 -- Dumping data for table `tbl_incident`
 --
 
-INSERT INTO `tbl_incident` (`id`, `locationID_fk`, `incidentID_fk`, `complaint`, `rescuer_team`, `referred_hospital`, `incident_date`, `created_date`) VALUES
-(46, 'LID-A6BF5085FC', 'IID-87B4CA1074', 'Headache', 'Team 1', 'Cadiz CIty Public Hospital', '2023-06-09', '2024-10-08 02:34:59'),
-(61, 'LID-BA94DF6805', 'IID-BE40B5C601', 'asd', 'asd', 'asd', '2024-10-09', '2024-10-09 02:23:53'),
-(63, 'LID-DC225321E0', 'IID-09E8D4DA06', 'Fatal Wounds', 'Team 1', 'St. Anne', '2024-10-09', '2024-10-09 02:57:12'),
-(64, 'LID-E032AD74E5', 'IID-87873C8021', 'sadsad', 'asdsad', 'sadsaddas', '2024-10-11', '2024-10-10 05:11:30'),
-(65, 'LID-BA94DF6805', 'IID-66476AA06C', 'asddas', 'asddsa', 'asdsda', '2024-10-10', '2024-10-10 12:07:47'),
-(66, 'LID-BA94DF6805', 'IID-68160C2BDF', 'asd', 'asdasd', 'asdsad', '2024-10-10', '2024-10-10 12:08:42'),
-(68, 'LID-BA94DF6805', 'IID-62F5C6BDF0', 'Fatal Wounds', 'Team 1', 'Bacolod CIty Public Hospital', '2024-10-10', '2024-10-10 13:12:34'),
-(69, 'LID-99EB9EFE47', 'IID-DE4DA147C6', 'asdsad', 'asdsads', 'asdsadsad', '2024-10-10', '2024-10-10 13:15:29');
+INSERT INTO `tbl_incident` (`id`, `locationID_fk`, `incidentID_fk`, `complaint`, `rescuer_team`, `referred_hospital`, `incident_date`, `incident_time`, `created_date`) VALUES
+(76, 'LID-4D141B1004', 'IID-FA616DA562', 'Stray Dog', 'Team 2', 'Sagay CIty Public Hospital', '2024-12-01', '11:19:00', '2024-12-01 03:20:19'),
+(77, 'LID-55EF6AF160', 'IID-3A5FCDA43B', 'Lack of Air', 'Team 1', 'Sagay CIty Public Hospital', '2024-12-01', '12:30:00', '2024-12-01 03:23:10'),
+(78, 'LID-4D141B1004', 'IID-2285E47AE6', 'Fatal Wounds', 'Team 1', 'Sagay CIty Public Hospital', '2024-08-07', '11:26:00', '2024-12-01 03:27:18'),
+(79, 'LID-66BE22D95E', 'IID-37EDCF1171', 'Fatal Wounds', 'Team 5', 'Escalante CIty Public Hospital', '2024-12-09', '13:28:00', '2024-12-01 05:25:51'),
+(80, 'LID-4D141B1004', 'IID-AC76B8D96D', 'Fatal Wounds', 'Team 3', 'St. Anna', '2024-01-23', '13:00:00', '2024-12-01 05:58:27'),
+(81, 'LID-491954603F', 'IID-75D6540ECC', 'Fatal Wounds', 'Team 6', 'Escalante CIty Public Hospital', '2024-12-16', '14:13:00', '2024-12-01 06:14:21'),
+(82, 'LID-C0AAB358FD', 'IID-F6EEF2ECE3', 'asdsd', 'asdas', 'dasdasd', '2024-12-16', '14:21:00', '2024-12-01 06:18:50'),
+(83, 'LID-1211CCF8F3', 'IID-1F1100E931', 'asdsad', 'asdsad', 'asd', '2024-12-01', '14:25:00', '2024-12-01 06:25:36');
 
 -- --------------------------------------------------------
 
@@ -141,6 +167,7 @@ CREATE TABLE `tbl_incident_location` (
   `id` int(11) NOT NULL,
   `locationID` varchar(255) NOT NULL,
   `location_name` varchar(255) NOT NULL,
+  `location_purok` varchar(255) NOT NULL,
   `latitude` decimal(15,8) NOT NULL,
   `longitude` decimal(15,8) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -149,13 +176,13 @@ CREATE TABLE `tbl_incident_location` (
 -- Dumping data for table `tbl_incident_location`
 --
 
-INSERT INTO `tbl_incident_location` (`id`, `locationID`, `location_name`, `latitude`, `longitude`) VALUES
-(34, 'LID-DE361B4E99', 'Colonia Divina', 10.95064679, 123.33651342),
-(42, 'LID-A6BF5085FC', 'Bato', 10.95649492, 123.31009208),
-(55, 'LID-BA94DF6805', 'Andres Bonifacio', 10.95242063, 123.31807155),
-(56, 'LID-DC225321E0', 'Bato', 10.95636431, 123.32093530),
-(57, 'LID-E032AD74E5', 'Bato', 10.94988838, 123.32241179),
-(58, 'LID-99EB9EFE47', 'Bulanon', 10.94857356, 123.34315532);
+INSERT INTO `tbl_incident_location` (`id`, `locationID`, `location_name`, `location_purok`, `latitude`, `longitude`) VALUES
+(84, 'LID-4D141B1004', 'Bulanon', 'Nangra', 10.91769624, 123.47277136),
+(85, 'LID-55EF6AF160', 'Bato', 'Linasgasan', 10.94200079, 123.42245786),
+(86, 'LID-66BE22D95E', 'Fabrica', 'Sto. Niño', 10.88917549, 123.35252116),
+(87, 'LID-491954603F', 'Bulanon', 'Ipil-ipil', 10.91821877, 123.47507309),
+(88, 'LID-C0AAB358FD', 'Tabao', 'Malipayon', 10.91904468, 123.44773221),
+(89, 'LID-1211CCF8F3', 'Bulanon', 'Mahogany', 10.91882556, 123.47707561);
 
 -- --------------------------------------------------------
 
@@ -180,20 +207,15 @@ CREATE TABLE `tbl_patient_info` (
 --
 
 INSERT INTO `tbl_patient_info` (`id`, `incidentID_fk`, `patientID`, `statusID`, `patient_name`, `patient_birthdate`, `patient_age`, `patient_sex`, `patient_address`) VALUES
-(39, 'IID-87B4CA1074', 'PID-98FA3D71D5', 'SID-001', 'Heleny Porch', '', 24, 'Female', 'Hitalon City'),
-(44, 'IID-87B4CA1074', 'PID-A8070E2308', 'SID-004', 'Mickey Mousess', '', 36, 'Male', 'Cadiz city'),
-(52, 'IID-BE40B5C601', 'PID-D9CA33819C', 'SID-001', 'Mark', '', 43, 'Male', '4545'),
-(55, 'IID-09E8D4DA06', 'PID-E5E4FE18AD', 'SID-004', 'dumm1 ', '', 23, 'Male', 'Punta'),
-(56, 'IID-09E8D4DA06', 'PID-2DEA28464C', 'SID-003', 'Dummy 2', '', 24, 'Female', 'Punta cabahug'),
-(57, 'IID-87873C8021', 'PID-CC7FD62E82', 'SID-001', 'justin', '', 23, 'Male', 'Banquerohan'),
-(58, 'IID-66476AA06C', 'PID-4319379266', 'SID-003', 'asdffdsa', '2024-10-10', 34, 'Male', 'asdsad'),
-(59, 'IID-66476AA06C', 'PID-48DAE1CEDD', 'SID-003', 'sdsda', '2024-10-10', 23, 'Male', 'asdsadsad'),
-(60, 'IID-68160C2BDF', 'PID-E747DE2510', 'SID-001', 'dfdf', '2007-01-10', 23, 'Male', 'sadasd'),
-(61, 'IID-62F5C6BDF0', 'PID-A5BE72F494', 'SID-002', 'Pancit Canton', '2000-09-08', 24, 'Male', 'Bais City'),
-(62, 'IID-DE4DA147C6', 'PID-A293A125A5', 'SID-003', 'asdsad', '2024-10-10', 23, 'Male', 'asdsad'),
-(63, 'IID-DE4DA147C6', 'PID-DB53B35B22', 'SID-001', 'asdsad', '2024-10-10', 232, 'Male', 'sdadsasd'),
-(65, 'IID-66476AA06C', 'PID-3DAD25FD06', 'SID-004', 'test4', '2011-02-10', 14, 'Male', 'Punta cabahug'),
-(66, 'IID-DE4DA147C6', 'PID-C4EBA280EB', 'SID-003', 'user 3', '2003-03-03', 21, 'Male', 'user 3');
+(78, 'IID-FA616DA562', 'PID-8E2CDA2648', 'SID-003', 'Mark', '2024-12-02', 12, 'Male', 'Bais City'),
+(79, 'IID-FA616DA562', 'PID-0AB5ECB287', 'SID-002', 'David', '2024-09-25', 24, 'Male', 'Punta cabahug'),
+(80, 'IID-3A5FCDA43B', 'PID-3CC644F605', 'SID-004', 'Martin', '2004-09-20', 20, 'Male', 'Banquerohan'),
+(81, 'IID-2285E47AE6', 'PID-5FF724A614', 'SID-003', 'Angel', '2000-09-09', 24, 'Female', 'Punta cabahug'),
+(82, 'IID-37EDCF1171', 'PID-0FDF484E1F', 'SID-004', 'Liam', '2009-09-09', 15, 'Male', 'Masubo Street'),
+(83, 'IID-AC76B8D96D', 'PID-5C497C0C64', 'SID-003', 'sadasd', '2000-09-09', 24, 'Male', 'Punta cabahug'),
+(84, 'IID-75D6540ECC', 'PID-1311DF53F7', 'SID-002', 'Hazel', '2006-06-06', 18, 'Male', 'Ipils Street'),
+(85, 'IID-F6EEF2ECE3', 'PID-80C9C25F57', 'SID-003', '232', '2003-09-21', 2323, 'Male', '2323'),
+(86, 'IID-1F1100E931', 'PID-1267CB2052', 'SID-003', 'asdsad', '2024-12-23', 2323, 'Female', '23232');
 
 -- --------------------------------------------------------
 
@@ -237,14 +259,14 @@ CREATE TABLE `tbl_type_incident` (
 --
 
 INSERT INTO `tbl_type_incident` (`id`, `incidentID`, `isVehiclular`, `type_of_incident`, `description`) VALUES
-(12, 'IID-87B4CA1074', 1, 'Other Incident', 'brake lost'),
-(20, 'IID-BE40B5C601', 1, 'Vehiclular Accident', 'asdasdasd'),
-(22, 'IID-09E8D4DA06', 1, 'Vehiclular Accident', 'They Didn\'t know that there is comming'),
-(23, 'IID-87873C8021', 0, 'Drowning', 'asdasd'),
-(24, 'IID-66476AA06C', 1, 'Other Incident', 'test 4'),
-(25, 'IID-68160C2BDF', 0, 'asdsad', 'asdasd'),
-(26, 'IID-62F5C6BDF0', 1, 'Vehiclular Accident', 'High due to drug abuse'),
-(27, 'IID-DE4DA147C6', 1, 'Other Incident', 'USER 3');
+(34, 'IID-FA616DA562', 1, 'Vechicular Incident', 'Without proper Helmet'),
+(35, 'IID-3A5FCDA43B', 0, 'Suicide', 'Depression due to fail of Grades'),
+(36, 'IID-2285E47AE6', 1, 'Other Incident', 'High due to drug abuse'),
+(37, 'IID-37EDCF1171', 0, 'Shooting Incident', 'Gang Issue'),
+(38, 'IID-AC76B8D96D', 0, 'Medical', 'sadsadasd'),
+(39, 'IID-75D6540ECC', 0, 'Drowning', 'Family Problem'),
+(40, 'IID-F6EEF2ECE3', 1, 'Vechicular Incident', 'asdasdasdsadasdasd'),
+(41, 'IID-1F1100E931', 0, 'Drowning', 'asdsadsad');
 
 -- --------------------------------------------------------
 
@@ -267,12 +289,9 @@ CREATE TABLE `tbl_vehicular_incident` (
 --
 
 INSERT INTO `tbl_vehicular_incident` (`id`, `incidentID`, `patient_classification`, `vehicle_type`, `intoxication`, `helmet`, `stray`) VALUES
-(8, 'IID-87B4CA1074', 'Classification', '4 Wheels', 'Alcholic', 1, 1),
-(10, 'IID-BE40B5C601', 'asdasd', 'asdasd', 'Alcholic', 1, 1),
-(11, 'IID-09E8D4DA06', 'N/A', 'PUmp Boat', 'Alcholic', 1, 1),
-(12, 'IID-62F5C6BDF0', 'Nothing', '4 Wheels', 'Alchol, Marijuana', 0, 0),
-(14, 'IID-66476AA06C', 's', 's', 's', 1, 1),
-(15, 'IID-DE4DA147C6', 'user 3', 'user 3 ', 'user 3 ', 0, 0);
+(17, 'IID-FA616DA562', 'Drunk', '4 Wheels', 'Alcholic', 1, 1),
+(18, 'IID-2285E47AE6', 'Nothing', '2 Wheels', 'Alchol, Marijuana', 0, 0),
+(19, 'IID-F6EEF2ECE3', 'asdasd', 'asdsad', 'asdasd', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -301,11 +320,20 @@ CREATE TABLE `total_of_injuries` (
 -- --------------------------------------------------------
 
 --
+-- Structure for view `incident_counts_by_barangay`
+--
+DROP TABLE IF EXISTS `incident_counts_by_barangay`;
+
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `incident_counts_by_barangay`  AS SELECT `barangays`.`barangay_name` AS `barangay_name`, count(`tbl_incident_location`.`location_name`) AS `incident_count` FROM ((select 'Andres Bonifacio' AS `barangay_name` union all select 'Bato' AS `Bato` union all select 'Baviera' AS `Baviera` union all select 'Bulanon' AS `Bulanon` union all select 'Campo Himoga-an' AS `Campo Himoga-an` union all select 'Campo Santiago' AS `Campo Santiago` union all select 'Colonia Divina' AS `Colonia Divina` union all select 'Rafaela Barrera' AS `Rafaela Barrera` union all select 'Fabrica' AS `Fabrica` union all select 'General Luna' AS `General Luna` union all select 'Himoga-an Baybay' AS `Himoga-an Baybay` union all select 'Lopez Jaena' AS `Lopez Jaena` union all select 'Malubon' AS `Malubon` union all select 'Maquiling' AS `Maquiling` union all select 'Molocaboc' AS `Molocaboc` union all select 'Old Sagay' AS `Old Sagay` union all select 'Paraiso' AS `Paraiso` union all select 'Plaridel' AS `Plaridel` union all select 'Poblacion I (Barangay 1)' AS `Poblacion I (Barangay 1)` union all select 'Poblacion II (Barangay 2)' AS `Poblacion II (Barangay 2)` union all select 'Puey' AS `Puey` union all select 'Rizal' AS `Rizal` union all select 'Taba-ao' AS `Taba-ao` union all select 'Tadlong' AS `Tadlong` union all select 'Vito' AS `Vito`) `barangays` left join `tbl_incident_location` on(`barangays`.`barangay_name` = `tbl_incident_location`.`location_name`)) GROUP BY `barangays`.`barangay_name` ;
+
+-- --------------------------------------------------------
+
+--
 -- Structure for view `incident_count_current_month_per_barangay_with_type`
 --
 DROP TABLE IF EXISTS `incident_count_current_month_per_barangay_with_type`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `incident_count_current_month_per_barangay_with_type`  AS SELECT `l`.`location_name` AS `barangay`, count(`i`.`locationID_fk`) AS `incident_count`, group_concat(`t`.`type_of_incident` separator ', ') AS `incident_types` FROM ((`tbl_incident` `i` join `tbl_incident_location` `l` on(`i`.`locationID_fk` = `l`.`locationID`)) join `tbl_type_incident` `t` on(`i`.`incidentID_fk` = `t`.`incidentID`)) WHERE `l`.`location_name` in ('Andres Bonifacio','Bato','Baviera','Bulanon','Campo Himoga-an','Campo Santiago','Colonia Divina','Rafaela Barrera','Fabrica','General Luna','Himoga-an Baybay','Lopez Jaena','Malubon','Maquiling','Molocaboc','Old Sagay','Paraiso','Plaridel','Poblacion I (Barangay 1)','Poblacion II (Barangay 2)','Puey','Rizal','Taba-ao','Tadlong','Vito') AND month(`i`.`incident_date`) = month(curdate()) AND year(`i`.`incident_date`) = year(curdate()) GROUP BY `l`.`location_name` ;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `incident_count_current_month_per_barangay_with_type`  AS SELECT `l`.`location_name` AS `barangay`, count(`i`.`locationID_fk`) AS `incident_count`, group_concat(`t`.`type_of_incident` separator ', ') AS `incident_types` FROM ((`tbl_incident` `i` join `tbl_incident_location` `l` on(`i`.`locationID_fk` = `l`.`locationID`)) join `tbl_type_incident` `t` on(`i`.`incidentID_fk` = `t`.`incidentID`)) WHERE `l`.`location_name` in ('Andres Bonifacio','Bato','Baviera','Bulanon','Campo Himoga-an','Campo Santiago','Colonia Divina','Rafaela Barrera','Fabrica','General Luna','Himoga-an Baybay','Lopez Jaena','Malubon','Maquiling','Molocaboc','Old Sagay','Paraiso','Plaridel','Poblacion I (Barangay 1)','Poblacion II (Barangay 2)','Puey','Rizal','Taba-ao','Tadlong','Vito') AND month(`i`.`incident_date`) = month(curdate()) AND year(`i`.`incident_date`) = year(curdate()) GROUP BY `l`.`location_name` ;
 
 -- --------------------------------------------------------
 
@@ -314,7 +342,16 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `incident_count_per_barangay_with_type`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `incident_count_per_barangay_with_type`  AS SELECT `l`.`location_name` AS `barangay`, count(`i`.`locationID_fk`) AS `incident_count`, group_concat(`t`.`type_of_incident` separator ', ') AS `incident_types` FROM ((`tbl_incident` `i` join `tbl_incident_location` `l` on(`i`.`locationID_fk` = `l`.`locationID`)) join `tbl_type_incident` `t` on(`i`.`incidentID_fk` = `t`.`incidentID`)) WHERE `l`.`location_name` in ('Andres Bonifacio','Bato','Baviera','Bulanon','Campo Himoga-an','Campo Santiago','Colonia Divina','Rafaela Barrera','Fabrica','General Luna','Himoga-an Baybay','Lopez Jaena','Malubon','Maquiling','Molocaboc','Old Sagay','Paraiso','Plaridel','Poblacion I (Barangay 1)','Poblacion II (Barangay 2)','Puey','Rizal','Taba-ao','Tadlong','Vito') GROUP BY `l`.`location_name` ;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `incident_count_per_barangay_with_type`  AS SELECT `l`.`location_name` AS `barangay`, count(`i`.`locationID_fk`) AS `incident_count`, group_concat(`t`.`type_of_incident` separator ', ') AS `incident_types` FROM ((`tbl_incident` `i` join `tbl_incident_location` `l` on(`i`.`locationID_fk` = `l`.`locationID`)) join `tbl_type_incident` `t` on(`i`.`incidentID_fk` = `t`.`incidentID`)) WHERE `l`.`location_name` in ('Andres Bonifacio','Bato','Baviera','Bulanon','Campo Himoga-an','Campo Santiago','Colonia Divina','Rafaela Barrera','Fabrica','General Luna','Himoga-an Baybay','Lopez Jaena','Malubon','Maquiling','Molocaboc','Old Sagay','Paraiso','Plaridel','Poblacion I (Barangay 1)','Poblacion II (Barangay 2)','Puey','Rizal','Taba-ao','Tadlong','Vito') GROUP BY `l`.`location_name` ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `incident_data_each_month_this_year`
+--
+DROP TABLE IF EXISTS `incident_data_each_month_this_year`;
+
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `incident_data_each_month_this_year`  AS SELECT `l`.`location_name` AS `barangay`, count(`i`.`locationID_fk`) AS `incident_count`, group_concat(distinct `t`.`type_of_incident` separator ', ') AS `incident_types`, month(`i`.`incident_date`) AS `incident_month`, year(`i`.`incident_date`) AS `incident_year` FROM ((`tbl_incident` `i` join `tbl_incident_location` `l` on(`i`.`locationID_fk` = `l`.`locationID`)) join `tbl_type_incident` `t` on(`i`.`incidentID_fk` = `t`.`incidentID`)) WHERE `l`.`location_name` in ('Andres Bonifacio','Bato','Baviera','Bulanon','Campo Himoga-an','Campo Santiago','Colonia Divina','Rafaela Barrera','Fabrica','General Luna','Himoga-an Baybay','Lopez Jaena','Malubon','Maquiling','Molocaboc','Old Sagay','Paraiso','Plaridel','Poblacion I (Barangay 1)','Poblacion II (Barangay 2)','Puey','Rizal','Taba-ao','Tadlong','Vito') GROUP BY `l`.`location_name`, month(`i`.`incident_date`), year(`i`.`incident_date`) ;
 
 -- --------------------------------------------------------
 
@@ -323,7 +360,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `map_incident_cases`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `map_incident_cases`  AS SELECT `i`.`locationID_fk` AS `locationID_fk`, count(`i`.`locationID_fk`) AS `location_count`, `l`.`latitude` AS `latitude`, `l`.`longitude` AS `longitude` FROM (`tbl_incident` `i` join `tbl_incident_location` `l` on(`i`.`locationID_fk` = `l`.`locationID`)) GROUP BY `i`.`locationID_fk`, `l`.`latitude`, `l`.`longitude` ;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `map_incident_cases`  AS SELECT `i`.`locationID_fk` AS `locationID_fk`, count(`i`.`locationID_fk`) AS `location_count`, `l`.`latitude` AS `latitude`, `l`.`longitude` AS `longitude` FROM (`tbl_incident` `i` join `tbl_incident_location` `l` on(`i`.`locationID_fk` = `l`.`locationID`)) GROUP BY `i`.`locationID_fk`, `l`.`latitude`, `l`.`longitude` ;
 
 -- --------------------------------------------------------
 
@@ -332,7 +369,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `month_analytics`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `month_analytics`  AS SELECT monthname(`tbl_incident`.`incident_date`) AS `month_name`, count(0) AS `incident_count` FROM `tbl_incident` GROUP BY month(`tbl_incident`.`incident_date`) ORDER BY month(`tbl_incident`.`incident_date`) ASC ;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `month_analytics`  AS SELECT monthname(`tbl_incident`.`incident_date`) AS `month_name`, count(0) AS `incident_count` FROM `tbl_incident` GROUP BY month(`tbl_incident`.`incident_date`) ORDER BY month(`tbl_incident`.`incident_date`) ASC ;
 
 -- --------------------------------------------------------
 
@@ -341,7 +378,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `past_year_analytics`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `past_year_analytics`  AS SELECT year(`tbl_incident`.`incident_date`) AS `incident_year`, count(0) AS `incident_count` FROM `tbl_incident` WHERE `tbl_incident`.`incident_date` >= curdate() - interval 5 year GROUP BY year(`tbl_incident`.`incident_date`) ORDER BY year(`tbl_incident`.`incident_date`) ASC ;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `past_year_analytics`  AS SELECT year(`tbl_incident`.`incident_date`) AS `incident_year`, count(0) AS `incident_count` FROM `tbl_incident` WHERE `tbl_incident`.`incident_date` >= curdate() - interval 5 year GROUP BY year(`tbl_incident`.`incident_date`) ORDER BY year(`tbl_incident`.`incident_date`) ASC ;
 
 -- --------------------------------------------------------
 
@@ -350,7 +387,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `top_three_incidents`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `top_three_incidents`  AS SELECT `tbl_type_incident`.`type_of_incident` AS `type_of_incident`, count(0) AS `total_cases` FROM `tbl_type_incident` GROUP BY `tbl_type_incident`.`type_of_incident` ORDER BY count(0) DESC LIMIT 0, 3 ;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `top_three_incidents`  AS SELECT `tbl_type_incident`.`type_of_incident` AS `type_of_incident`, count(0) AS `total_cases` FROM `tbl_type_incident` GROUP BY `tbl_type_incident`.`type_of_incident` ORDER BY count(0) DESC LIMIT 0, 3 ;
 
 -- --------------------------------------------------------
 
@@ -359,7 +396,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `total_of_injuries`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `total_of_injuries`  AS SELECT count(case when `tbl_patient_info`.`statusID` = 'SID-001' then 1 end) AS `minor`, count(case when `tbl_patient_info`.`statusID` = 'SID-002' then 1 end) AS `major`, count(case when `tbl_patient_info`.`statusID` = 'SID-003' then 1 end) AS `fatal`, count(case when `tbl_patient_info`.`statusID` = 'SID-004' then 1 end) AS `died` FROM `tbl_patient_info` ;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `total_of_injuries`  AS SELECT count(case when `tbl_patient_info`.`statusID` = 'SID-001' then 1 end) AS `minor`, count(case when `tbl_patient_info`.`statusID` = 'SID-002' then 1 end) AS `major`, count(case when `tbl_patient_info`.`statusID` = 'SID-003' then 1 end) AS `fatal`, count(case when `tbl_patient_info`.`statusID` = 'SID-004' then 1 end) AS `died` FROM `tbl_patient_info` ;
 
 --
 -- Indexes for dumped tables
@@ -432,19 +469,19 @@ ALTER TABLE `tbl_admin_access`
 -- AUTO_INCREMENT for table `tbl_incident`
 --
 ALTER TABLE `tbl_incident`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=84;
 
 --
 -- AUTO_INCREMENT for table `tbl_incident_location`
 --
 ALTER TABLE `tbl_incident_location`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=90;
 
 --
 -- AUTO_INCREMENT for table `tbl_patient_info`
 --
 ALTER TABLE `tbl_patient_info`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=87;
 
 --
 -- AUTO_INCREMENT for table `tbl_patient_status`
@@ -456,13 +493,13 @@ ALTER TABLE `tbl_patient_status`
 -- AUTO_INCREMENT for table `tbl_type_incident`
 --
 ALTER TABLE `tbl_type_incident`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT for table `tbl_vehicular_incident`
 --
 ALTER TABLE `tbl_vehicular_incident`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- Constraints for dumped tables

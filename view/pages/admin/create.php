@@ -20,42 +20,33 @@ require_once('../../../controller/AdminController.php'); ?>
         <select class="form-select" id="incidentType" name="incident_type" aria-label="Incident Type">
           <option value="" selected disabled>Choose an incident type</option>
           <option value="isVehiclular">Vehicular Incident</option>
-          <option value="isOther">Other Incident</option>
+          <option value="Drowning">Drowning</option>
+          <option value="Suicide">Suicide</option>
+          <option value="Shooting Incident">Shooting Incident</option>
+          <option value="Medical">Medical</option>
+          <option value="Trauma">Trauma</option>
+          <option value="Walk In">Walk In</option>
         </select>
       </div>
       <?php 
-      // if Incident Location is already exist you wont see this Navigation else if New location then this will show
 
+      // if Incident Location is already exist you wont see this Navigation else if New location then this will show
         if(!isset($_GET['locID'])){
           echo " <div class='mb-3'>
-                  <label for='incidentType' class='form-label'>Baranggay</label>
-                  <select class='form-select' id='incidentType' name='location_name' aria-label='Location'>
-                    <option value='''' selected disabled>Choose a Baranggay</option>
-                    <option value='Andres Bonifacio'>Andres Bonifacio</option>
+                  <label for='barangay' class='form-label'>Baranggay</label>
+                  <select class='form-select' id='barangay' name='location_name' aria-label='Barangay'>
+                    <option value='' selected disabled>Choose a Barangay</option>
                     <option value='Bato'>Bato</option>
-                    <option value='Baviera'>Baviera</option>
                     <option value='Bulanon'>Bulanon</option>
-                    <option value='Campo Himoga-an'>Campo Himoga-an</option>
-                    <option value='Campo Santiago'>Campo Santiago</option>
-                    <option value='Colonia Divina'>Colonia Divina</option>
-                    <option value='Rafaela Barrera'>Rafaela Barrera</option>
-                    <option value='Fabrica'>Fabrica</option>
-                    <option value='General Luna'>General Luna</option>
-                    <option value='Himoga-an Baybay'>Himoga-an Baybay</option>
-                    <option value='Lopez Jaena'>Lopez Jaena</option>
-                    <option value='Malubon'>Malubon</option>
-                    <option value='Maquiling'>Maquiling</option>
-                    <option value='Molocaboc'>Molocaboc</option>
-                    <option value='Old Sagay'>Old Sagay</option>
-                    <option value='Paraiso'>Paraiso</option>
-                    <option value='Plaridel'>Plaridel</option>
-                    <option value='Poblacion I (Barangay 1)'>Poblacion I (Barangay 1)</option>
-                    <option value='Poblacion II (Barangay 2)'>Poblacion II (Barangay 2)</option>
-                    <option value='Puey'>Puey</option>
-                    <option value='Rizal'>Rizal</option>
-                    <option value='Taba-ao'>Taba-ao</option>
-                    <option value='Tadlong'>Tadlong</option>
-                    <option value='Vito'>Vito</option>
+                    <option value='Andres Bonifacio'>Andres Bonifacio</option>
+                    <!-- Add other barangays as needed -->
+                  </select>
+                </div>
+
+                <div class='mb-3'>
+                  <label for='purok' class='form-label'>Purok</label>
+                  <select class='form-select' id='purok' name='location_purok' aria-label='Purok'>
+                    <option value='' selected disabled>Choose a Purok</option>
                   </select>
                 </div>
           ";
@@ -133,6 +124,10 @@ require_once('../../../controller/AdminController.php'); ?>
               <label for="incidentDate" class="form-label">Incident Date</label>
               <input type="date" class="form-control" id="incidentDate" name="incident_date" required>
             </div>
+            <div class="mb-3">
+              <label for="incidentTime" class="form-label">Incident Time</label>
+              <input type="time" class="form-control" id="incidentTime" name="incident_time" required>
+            </div>
           <!-- Vehicular Incident Form -->
           <div id="vehicular-form" class="d-none">
             <h4>Vehicular Incident Details</h4>
@@ -170,17 +165,17 @@ require_once('../../../controller/AdminController.php'); ?>
           </div>
           <!-- Other Incident Form -->
           <div id="other-form" class="d-none">
-            <h4>Other Incident Details</h4>
-            <div class="mb-3">
+            <h4>Incident Details</h4>
+            <!-- <div class="mb-3">
               <label for="typeOfIncident" class="form-label">Type of Incident</label>
               <input type="text" class="form-control" id="typeOfIncident" name="type_of_incident">
-            </div>
+            </div> -->
             <div class="mb-3">
               <label for="description" class="form-label">Description</label>
               <textarea class="form-control" id="description" name="description"></textarea>
             </div>
           </div>
-
+        <!-- CREATE INCIDENT -->
           <input type="hidden" name="action" value="createIncident">
           <button type="submit" class="btn btn-primary w-100">Submit</button>
         </form>
@@ -194,6 +189,50 @@ require_once('../../../controller/AdminController.php'); ?>
   </div>
 
   <script>
+
+
+    // Fetch the JSON file
+      fetch('barangay_purok.json')
+        .then(response => response.json())
+        .then(data => {
+          // Populate the barangay dropdown
+          const barangaySelect = document.getElementById('barangay');
+          const purokSelect = document.getElementById('purok');
+
+          // Populate Barangay dropdown options
+          for (const barangay in data) {
+            const option = document.createElement('option');
+            option.value = barangay;
+            option.textContent = barangay;
+            barangaySelect.appendChild(option);
+          }
+
+          // Handle Barangay change
+          barangaySelect.addEventListener('change', () => {
+            const selectedBarangay = barangaySelect.value;
+
+            // Clear existing Purok options
+            purokSelect.innerHTML = '<option value="" selected disabled>Choose a Purok</option>';
+
+            // Populate Purok dropdown options
+            if (selectedBarangay && data[selectedBarangay]) {
+              data[selectedBarangay].forEach(purok => {
+                const option = document.createElement('option');
+                option.value = purok;
+                option.textContent = purok;
+                purokSelect.appendChild(option);
+              });
+
+              // Enable Purok dropdown
+              purokSelect.disabled = false;
+            } else {
+              purokSelect.disabled = true;
+            }
+          });
+        })
+        .catch(error => console.error('Error loading barangay_puroks.json:', error));
+
+      
     let patientCount = 1; // Initialize patient count
 
     function addPatientForm() {
@@ -280,13 +319,10 @@ require_once('../../../controller/AdminController.php'); ?>
             if (incidentType === 'isVehiclular') {
                 document.getElementById('vehicular-form').classList.remove('d-none');
                 document.getElementById('other-form').classList.add('d-none');
-            } else if (incidentType === 'isOther') {
+            } else {
                 document.getElementById('other-form').classList.remove('d-none');
                 document.getElementById('vehicular-form').classList.add('d-none');
-            } else {
-                document.getElementById('vehicular-form').classList.add('d-none');
-                document.getElementById('other-form').classList.add('d-none');
-            }
+            } 
         });
     </script>
 <?php require_once('../../components/footer.php')?>

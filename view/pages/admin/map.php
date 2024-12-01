@@ -19,7 +19,7 @@ require_once('../../components/header.php')?>
     </div>
     <script>
         // Initialize the map
-        var map = L.map('map').setView([10.948713, 123.336492], 14);
+        var map = L.map('map').setView([10.903399, 123.449753], 14);
 
         // Load OpenStreetMap tiles
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -56,6 +56,8 @@ require_once('../../components/header.php')?>
                     var lat = parseFloat(location.latitude);
                     var lng = parseFloat(location.longitude);
                     var locID = location.locationID_fk;
+                    var location_name = location.location_name;
+                    var location_purok = location.location_purok;
                     var cases = parseInt(location.location_count);
 
                     // Select the appropriate icon based on case count
@@ -72,7 +74,7 @@ require_once('../../components/header.php')?>
                     L.marker([lat, lng], { icon: icon }).addTo(map)
                         .bindPopup(`<div>
                             <strong>Incident Cases:</strong> ${cases}<br>
-                            <a class="btn btn-primary w-100 text-white" href="location_incident.php?locID=${locID}&lat=${lat}&long=${lng}")">Manage</a>
+                            <a class="btn btn-primary w-100 text-white" href="location_incident.php?locID=${locID}&lat=${lat}&long=${lng}&locName=${location_name}&locPurok=${location_purok}">${location_name}</a>
                         </div>`);
                 });
             })

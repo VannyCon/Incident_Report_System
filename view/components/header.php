@@ -39,6 +39,9 @@
                                     <a class='nav-link ms-3' href='map.php'>Map</a>
                                 </li>
                                 <li class='nav-item'>
+                                    <a class='nav-link ms-3' href='baranggay.php'>Baranggay</a>
+                                </li>
+                                <li class='nav-item'>
                                     <a class='nav-link ms-3' href='report.php'>Report</a>
                                 </li>
                                 <li class='nav-item'>

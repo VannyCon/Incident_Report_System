@@ -7,6 +7,8 @@ $title = 'Update';
 // Assuming IncidentID is passed as a GET parameter
 if (isset($_GET['IncidentID'])) {
     $incidentID = $_GET['IncidentID'];
+    $locName = $_GET['locName'];
+    
 } else {
     header("Location: map.php");
     exit();
@@ -54,12 +56,18 @@ if (isset($incidentData['patients'])) {
         <!-- Select Incident Type -->
         <div class="mb-3">
             <label for="incidentType" class="form-label">Select Incident Type</label>
-            <select class="form-select" id="incidentType" name="incident_type" aria-label="Incident Type" required>
-                <option value="" disabled>Choose an incident type</option>
-                <option value="isVehiclular" <?php echo (isset($incidentData['isVehiclular']) && $incidentData['isVehiclular'] == true) ? 'selected' : ''; ?>>Vehicular Incident</option>
-                <option value="isOther" <?php echo (isset($incidentData['isVehiclular']) && $incidentData['isVehiclular'] == false) ? 'selected' : ''; ?>>Other Incident</option>
+            <select class="form-select" id="incidentType" name="incident_type" aria-label="Incident Type">
+                <option value="" <?php echo (empty($incidentData['type_of_incident'])) ? 'selected' : ''; ?> disabled>Choose an incident type</option>
+                <option value="isVehiclular" <?php echo (isset($incidentData['type_of_incident']) && $incidentData['type_of_incident'] == 'isVehiclular') ? 'selected' : ''; ?>>Vehicular Incident</option>
+                <option value="Drowning" <?php echo (isset($incidentData['type_of_incident']) && $incidentData['type_of_incident'] == 'Drowning') ? 'selected' : ''; ?>>Drowning</option>
+                <option value="Suicide" <?php echo (isset($incidentData['type_of_incident']) && $incidentData['type_of_incident'] == 'Suicide') ? 'selected' : ''; ?>>Suicide</option>
+                <option value="Shooting Incident" <?php echo (isset($incidentData['type_of_incident']) && $incidentData['type_of_incident'] == 'Shooting Incident') ? 'selected' : ''; ?>>Shooting Incident</option>
+                <option value="Medical" <?php echo (isset($incidentData['type_of_incident']) && $incidentData['type_of_incident'] == 'Medical') ? 'selected' : ''; ?>>Medical</option>
+                <option value="Trauma" <?php echo (isset($incidentData['type_of_incident']) && $incidentData['type_of_incident'] == 'Trauma') ? 'selected' : ''; ?>>Trauma</option>
+                <option value="Walk In" <?php echo (isset($incidentData['type_of_incident']) && $incidentData['type_of_incident'] == 'Walk In') ? 'selected' : ''; ?>>Walk In</option>
             </select>
         </div>
+
         <!-- <input type="text" name="lat" id="" value="<?php echo $_GET['lat']?>">
         <input type="text" name="long" id="" value="<?php echo $_GET['long']?>"> -->
         <input type="hidden" class="form-control" id="incidentID_fk" name="incidentID_fk" value="<?php echo htmlspecialchars($incidentData['incidentID_fk']); ?>" required>
@@ -152,6 +160,10 @@ if (isset($incidentData['patients'])) {
             <label for="incidentDate" class="form-label">Incident Date</label>
             <input type="date" class="form-control" id="incidentDate" name="incident_date" value="<?php echo htmlspecialchars($incidentData['incident_date']); ?>" required>
         </div>
+        <div class="mb-3">
+            <label for="incidenttime" class="form-label">Incident Time</label>
+            <input type="time" class="form-control" id="incidenttime" name="incident_time" value="<?php echo htmlspecialchars($incidentData['incident_time']); ?>" required>
+        </div>
 
         <!-- Vehicular Incident Form -->
         <div id="vehicular-form" class="<?php echo ($incidentData['isVehiclular']) ? '' : 'd-none'; ?>">
@@ -212,6 +224,48 @@ if (isset($incidentData['patients'])) {
 
 <script>
     let patientCount = 1; // Initialize patient count
+
+// Fetch the JSON file
+fetch('barangay_purok.json')
+        .then(response => response.json())
+        .then(data => {
+          // Populate the barangay dropdown
+          const barangaySelect = document.getElementById('barangay');
+          const purokSelect = document.getElementById('purok');
+
+          // Populate Barangay dropdown options
+          for (const barangay in data) {
+            const option = document.createElement('option');
+            option.value = barangay;
+            option.textContent = barangay;
+            barangaySelect.appendChild(option);
+          }
+
+          // Handle Barangay change
+          barangaySelect.addEventListener('change', () => {
+            const selectedBarangay = barangaySelect.value;
+
+            // Clear existing Purok options
+            purokSelect.innerHTML = '<option value="" selected disabled>Choose a Purok</option>';
+
+            // Populate Purok dropdown options
+            if (selectedBarangay && data[selectedBarangay]) {
+              data[selectedBarangay].forEach(purok => {
+                const option = document.createElement('option');
+                option.value = purok;
+                option.textContent = purok;
+                purokSelect.appendChild(option);
+              });
+
+              // Enable Purok dropdown
+              purokSelect.disabled = false;
+            } else {
+              purokSelect.disabled = true;
+            }
+          });
+        })
+        .catch(error => console.error('Error loading barangay_puroks.json:', error));
+
 
     function addPatientForm() {
         // Increment the patient count
@@ -295,13 +349,10 @@ if (isset($incidentData['patients'])) {
             if (incidentType === 'isVehiclular') {
                 document.getElementById('vehicular-form').classList.remove('d-none');
                 document.getElementById('other-form').classList.add('d-none');
-            } else if (incidentType === 'isOther') {
+            } else {
                 document.getElementById('other-form').classList.remove('d-none');
                 document.getElementById('vehicular-form').classList.add('d-none');
-            } else {
-                document.getElementById('vehicular-form').classList.add('d-none');
-                document.getElementById('other-form').classList.add('d-none');
-            }
+            } 
         });
     </script>
 

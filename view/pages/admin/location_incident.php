@@ -12,9 +12,10 @@
 
         if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] == 'updateLocName'){
             $location_name = isset($_POST['location_name']) ? $_POST['location_name'] : null;
-            $status = $adminService->updateBrgyLocation($LocID, $location_name);
+            $location_purok = isset($_POST['location_purok']) ? $_POST['location_purok'] : null;
+            $status = $adminService->updateBrgyLocation($LocID, $location_name, $location_purok);
             if($status == true){
-                header("Location: location_incident.php?locID=$locID&lat=$lat&long=$long");
+                header("Location: location_incident.php?locID=$locID&lat=$lat&long=$long&locName=$location_name&locPurok=$location_purok");
                 exit();
             }else{
                 header("Location: index.php?error=1");
@@ -26,9 +27,14 @@
 <?php require_once('../../components/header.php')?>
 <div class="d-flex justify-content-between mx-5 mt-5">
     <a href="map.php" class="btn btn-outline-danger">Back</a>
-    <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#updateLocationNameModal" data-id="<?= $incident['incidentID_fk'] ?>">
+    <button type="button" class="btn btn-info" 
+            data-bs-toggle="modal" 
+            data-bs-target="#updateLocationNameModal" 
+            data-location-name="<?= $_GET['locName'] ?>" 
+            data-location-purok="<?= $_GET['locPurok'] ?>">
         Update Location Name
     </button>
+
     <a href="create.php?<?php echo "locID=$LocID&lat=$lat&long=$long"; ?>" class="btn btn-warning">Create</a>
 </div>
 
@@ -54,17 +60,66 @@
         </div>
     </div>
 </div>
+    <div class="container mt-4">
+
+        <div class="card">
+            <div class="card-header bg-success">
+                <div class="d-flex justify-content-between">
+                    <h5 class="card-title text-white"><?php echo htmlspecialchars($_GET['locName']); ?></h5>
+                    <a href="baranggay_incident.php?baranggay=<?php echo htmlspecialchars($_GET['locName']); ?>" class="btn btn-primary">Check</a>
+                </div>
+                
+            </div>
+            <div class="card-body">
+                <p><strong>Purok: </strong><?php echo htmlspecialchars($_GET['locPurok']); ?> </p>
+                <p><strong>Incident Count:</strong> 
+                <?php 
+                if (!empty($incidents)): 
+                    // Remove duplicates and count incidents.
+                    $uniqueIncidentIds = [];
+                    foreach ($incidents as $incident) {
+                        if (!in_array($incident['incident_id'], $uniqueIncidentIds)) {
+                            $uniqueIncidentIds[] = $incident['incident_id'];
+                        }
+                    }
+                    // Display the count of unique incidents.
+                    echo count($uniqueIncidentIds);
+                else: 
+                    echo "No Incident Found.";
+                    header("Location: index.php");
+                    exit();
+                endif; 
+                ?>
+                </p>
+            </div>
+        </div>
+
+
+    </div>
 
 
 
 <?php if (!empty($incidents)): ?>
     <?php foreach ($incidents as $incident): ?>
         <div class="container mt-4">
+            
             <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title">Incident Detail</h5>
+                <div class="card-header bg-primary">
+                    <p class="card-title text-white"><strong>Date & Time: </strong>
+                        <?php
+                            $date = $incident['incident_date']; // The date from your data
+                            $formattedDate = date("F j, Y", strtotime($date)); // Convert to 'October 7, 2024'
+                            echo $formattedDate; // Output the formatted date
+                        ?>
+                        <?php
+                            $time = $incident['incident_time']; // The date from your data
+                            $formattedTime = date("g:i a", strtotime($time)); // Convert to '12:45 PM'
+                            echo $formattedTime; // Output the formatted date
+                        ?>
+                    </p>
                 </div>
                 <div class="card-body row">
+                    <small>Incident Details</small>
                     <div class="col col-12 my-3">
                         
                         <!-- Loop through each patient info -->
@@ -144,15 +199,8 @@
                     </div>
                 </div>
                 <div class="card-footer text-muted">
-                    <p>Incident Date: 
-                        <?php
-                            $date = $incident['incident_date']; // The date from your data
-                            $formattedDate = date("F j, Y", strtotime($date)); // Convert to 'October 7, 2024'
-                            echo $formattedDate; // Output the formatted date
-                        ?>
-                    </p>
-
-                    <a href="update.php?IncidentID=<?= $incident['incidentID_fk']; ?>&locID=<?= $LocID ?>&lat=<?= $lat ?>&long=<?= $long ?>" class="btn btn-info">Update</a>
+                   
+                    <a href="update.php?IncidentID=<?= $incident['incidentID_fk']; ?>&locID=<?= $LocID ?>&lat=<?= $lat ?>&long=<?= $long ?>&locName=<?=$_GET['locName'] ?>&locPurok=<?=$_GET['locPurok'] ?>" class="btn btn-info">Update</a>
                     <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="<?= $incident['incidentID_fk'] ?>">
                         Delete
                     </button>
@@ -160,58 +208,39 @@
             </div>
         </div>
 
-
         <!-- Update Location Name Modal -->
-        <div class="modal fade" id="updateLocationNameModal" tabindex="-1" aria-labelledby="updateLocationNameModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="updateLocationNameModalLabel">Update Location Name</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="mb-3 p-2">
-                    <form id="updateLocationNameForm" method="POST" action="">
-                        <label for="incidentType" class="form-label">Barangay</label>
-                        <select class="form-select" id="incidentType" name="location_name" aria-label="Location">
-                            <option value="Andres Bonifacio" <?= ($incident['location_name'] == 'Andres Bonifacio') ? 'selected' : '' ?>>Andres Bonifacio</option>
-                            <option value="Bato" <?= ($incident['location_name'] == 'Bato') ? 'selected' : '' ?>>Bato</option>
-                            <option value="Baviera" <?= ($incident['location_name'] == 'Baviera') ? 'selected' : '' ?>>Baviera</option>
-                            <option value="Bulanon" <?= ($incident['location_name'] == 'Bulanon') ? 'selected' : '' ?>>Bulanon</option>
-                            <option value="Campo Himoga-an" <?= ($incident['location_name'] == 'Campo Himoga-an') ? 'selected' : '' ?>>Campo Himoga-an</option>
-                            <option value="Campo Santiago" <?= ($incident['location_name'] == 'Campo Santiago') ? 'selected' : '' ?>>Campo Santiago</option>
-                            <option value="Colonia Divina" <?= ($incident['location_name'] == 'Colonia Divina') ? 'selected' : '' ?>>Colonia Divina</option>
-                            <option value="Rafaela Barrera" <?= ($incident['location_name'] == 'Rafaela Barrera') ? 'selected' : '' ?>>Rafaela Barrera</option>
-                            <option value="Fabrica" <?= ($incident['location_name'] == 'Fabrica') ? 'selected' : '' ?>>Fabrica</option>
-                            <option value="General Luna" <?= ($incident['location_name'] == 'General Luna') ? 'selected' : '' ?>>General Luna</option>
-                            <option value="Himoga-an Baybay" <?= ($incident['location_name'] == 'Himoga-an Baybay') ? 'selected' : '' ?>>Himoga-an Baybay</option>
-                            <option value="Lopez Jaena" <?= ($incident['location_name'] == 'Lopez Jaena') ? 'selected' : '' ?>>Lopez Jaena</option>
-                            <option value="Malubon" <?= ($incident['location_name'] == 'Malubon') ? 'selected' : '' ?>>Malubon</option>
-                            <option value="Maquiling" <?= ($incident['location_name'] == 'Maquiling') ? 'selected' : '' ?>>Maquiling</option>
-                            <option value="Molocaboc" <?= ($incident['location_name'] == 'Molocaboc') ? 'selected' : '' ?>>Molocaboc</option>
-                            <option value="Old Sagay" <?= ($incident['location_name'] == 'Old Sagay') ? 'selected' : '' ?>>Old Sagay</option>
-                            <option value="Paraiso" <?= ($incident['location_name'] == 'Paraiso') ? 'selected' : '' ?>>Paraiso</option>
-                            <option value="Plaridel" <?= ($incident['location_name'] == 'Plaridel') ? 'selected' : '' ?>>Plaridel</option>
-                            <option value="Poblacion I (Barangay 1)" <?= ($incident['location_name'] == 'Poblacion I (Barangay 1)') ? 'selected' : '' ?>>Poblacion I (Barangay 1)</option>
-                            <option value="Poblacion II (Barangay 2)" <?= ($incident['location_name'] == 'Poblacion II (Barangay 2)') ? 'selected' : '' ?>>Poblacion II (Barangay 2)</option>
-                            <option value="Puey" <?= ($incident['location_name'] == 'Puey') ? 'selected' : '' ?>>Puey</option>
-                            <option value="Rizal" <?= ($incident['location_name'] == 'Rizal') ? 'selected' : '' ?>>Rizal</option>
-                            <option value="Taba-ao" <?= ($incident['location_name'] == 'Taba-ao') ? 'selected' : '' ?>>Taba-ao</option>
-                            <option value="Tadlong" <?= ($incident['location_name'] == 'Tadlong') ? 'selected' : '' ?>>Tadlong</option>
-                            <option value="Vito" <?= ($incident['location_name'] == 'Vito') ? 'selected' : '' ?>>Vito</option>
-                        </select>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                       
-                            <input type="hidden" name="incidentID" id="incidentID">
-                            <input type="hidden" name="action" value="updateLocName">
-                            <button type="submit" class="btn btn-danger">Update</button>
-                        </form>
+            <div class="modal fade" id="updateLocationNameModal" tabindex="-1" aria-labelledby="updateLocationNameModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="updateLocationNameModalLabel">Update Location Name</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="mb-3 p-2">
+                            <form id="updateLocationNameForm" method="POST" action="">
+                                <div class="mb-3">
+                                    <label for="barangay" class="form-label">Barangay</label>
+                                    <select class="form-select" id="barangay" name="location_name" aria-label="Barangay">
+                                        <option value="" selected disabled>Choose a Barangay</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="purok" class="form-label">Purok</label>
+                                    <select class="form-select" id="purok" name="location_purok" aria-label="Purok" disabled>
+                                        <option value="" selected disabled>Choose a Purok</option>
+                                    </select>
+                                </div>
+                                <input type="hidden" name="incidentID" id="incidentID">
+                                <input type="hidden" name="action" value="updateLocName">
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-danger">Update</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
         
     <?php endforeach; ?>
 <?php else: ?>
@@ -223,6 +252,93 @@
 <?php endif; ?>
 
 <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+    const updateLocationNameModal = document.getElementById('updateLocationNameModal');
+
+    // Handle modal show event
+    updateLocationNameModal.addEventListener('show.bs.modal', (event) => {
+        const button = event.relatedTarget; // Button that triggered the modal
+        const incidentID = button.getAttribute('data-id');
+        const locationName = button.getAttribute('data-location-name');
+        const locationPurok = button.getAttribute('data-location-purok');
+
+        const barangaySelect = updateLocationNameModal.querySelector('#barangay');
+        const purokSelect = updateLocationNameModal.querySelector('#purok');
+        const incidentIDInput = updateLocationNameModal.querySelector('#incidentID');
+
+        // Set the hidden input for incident ID
+        incidentIDInput.value = incidentID;
+
+        // Preselect the Barangay
+        barangaySelect.value = locationName;
+
+        // Fetch the JSON file for barangays and puroks
+        fetch('barangay_purok.json')
+            .then(response => response.json())
+            .then(data => {
+                // Populate Barangay dropdown
+                barangaySelect.innerHTML = '<option value="" selected disabled>Choose a Barangay</option>';
+                for (const barangay in data) {
+                    const option = document.createElement('option');
+                    option.value = barangay;
+                    option.textContent = barangay;
+                    barangaySelect.appendChild(option);
+                }
+
+                // Set the selected Barangay and populate the Purok dropdown
+                barangaySelect.value = locationName;
+
+                if (data[locationName]) {
+                    purokSelect.innerHTML = '<option value="" selected disabled>Choose a Purok</option>';
+                    data[locationName].forEach(purok => {
+                        const option = document.createElement('option');
+                        option.value = purok;
+                        option.textContent = purok;
+                        purokSelect.appendChild(option);
+                    });
+                    purokSelect.value = locationPurok; // Preselect the Purok
+                    purokSelect.disabled = false;
+                } else {
+                    purokSelect.innerHTML = '<option value="" selected disabled>No Purok Available</option>';
+                    purokSelect.disabled = true;
+                }
+            })
+            .catch(error => console.error('Error loading barangay_purok.json:', error));
+    });
+
+    // Handle Barangay selection change
+    const barangaySelect = document.getElementById('barangay');
+    const purokSelect = document.getElementById('purok');
+
+    barangaySelect.addEventListener('change', () => {
+        const selectedBarangay = barangaySelect.value;
+
+        // Clear existing Purok options
+        purokSelect.innerHTML = '<option value="" selected disabled>Choose a Purok</option>';
+
+        // Fetch the JSON file again to repopulate based on selection
+        fetch('barangay_purok.json')
+            .then(response => response.json())
+            .then(data => {
+                if (data[selectedBarangay]) {
+                    data[selectedBarangay].forEach(purok => {
+                        const option = document.createElement('option');
+                        option.value = purok;
+                        option.textContent = purok;
+                        purokSelect.appendChild(option);
+                    });
+                    purokSelect.disabled = false;
+                } else {
+                    purokSelect.innerHTML = '<option value="" selected disabled>No Purok Available</option>';
+                    purokSelect.disabled = true;
+                }
+            })
+            .catch(error => console.error('Error loading barangay_purok.json:', error));
+    });
+});
+
+
     document.addEventListener('DOMContentLoaded', function () {
         const deleteModal = document.getElementById('deleteModal');
         deleteModal.addEventListener('show.bs.modal', function (event) {

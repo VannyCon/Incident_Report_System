@@ -7,7 +7,21 @@ class AdminServices extends config {
     //THis part get All the Incident which pass to map for Mapping
     public function getAllIncident() {
         try {
-            $query = "SELECT `locationID_fk`, `location_count`, `latitude`, `longitude` FROM `map_incident_cases` WHERE 1";
+            $query = "SELECT 
+                            m.locationID_fk, 
+                            m.location_count, 
+                            m.latitude,
+                            m.longitude, 
+                            t.locationID, 
+                            t.location_name,
+                            t.location_purok
+                        FROM 
+                            map_incident_cases m
+                        JOIN 
+                            tbl_incident_location t 
+                        ON 
+                            m.locationID_fk = t.locationID;
+                        ";
             $stmt = $this->pdo->prepare($query); // Prepare the query
             $stmt->execute(); // Execute the query
             $locations =  $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch the result
@@ -28,6 +42,7 @@ class AdminServices extends config {
                         tbl_incident.rescuer_team,
                         tbl_incident.referred_hospital,
                         tbl_incident.incident_date,
+                        tbl_incident.incident_time,
     
                         tbl_patient_info.patient_name,
                         tbl_patient_info.patient_birthdate,
@@ -39,6 +54,7 @@ class AdminServices extends config {
                         tbl_incident_location.latitude,
                         tbl_incident_location.longitude,
                         tbl_incident_location.location_name,
+                        tbl_incident_location.location_purok,
                         tbl_patient_status.color AS patient_status_color,
                         tbl_patient_status.description AS patient_status_description,
                         tbl_type_incident.type_of_incident,
@@ -86,7 +102,7 @@ class AdminServices extends config {
     
                     WHERE tbl_incident_location.locationID = :LocID
     
-                    ORDER BY tbl_incident.incident_date DESC";
+                   ORDER BY tbl_incident.incident_date DESC, tbl_incident.incident_time DESC";
     
             $stmt = $this->pdo->prepare($query);
             $stmt->bindParam(':LocID', $LocID);
@@ -106,9 +122,11 @@ class AdminServices extends config {
                         'rescuer_team' => $row['rescuer_team'],
                         'referred_hospital' => $row['referred_hospital'],
                         'incident_date' => $row['incident_date'],
+                        'incident_time' => $row['incident_time'],
                         'latitude' => $row['latitude'],
                         'longitude' => $row['longitude'],
                         'location_name' => $row['location_name'],
+                        'location_purok' => $row['location_purok'],
                         'type_of_incident' => $row['type_of_incident'],
                         'incident_description' => $row['incident_description'],
                         'isVehiclular' => $row['isVehiclular'],
@@ -151,7 +169,8 @@ class AdminServices extends config {
                             i.rescuer_team,
                             i.referred_hospital,
                             i.incident_date,
-    
+                            i.incident_time,
+
                             il.latitude,
                             il.longitude,
     
@@ -300,11 +319,13 @@ class AdminServices extends config {
         $latitude, 
         $longitude,
         $location_name, 
+        $location_purok,
         $patients, //array patient info
         $complaint, 
         $rescuer_team, 
         $referred_hospital, 
         $incident_date, 
+        $incident_time, 
         $isVehiclular, 
         $patient_classification, 
         $vehicle_type, 
@@ -327,10 +348,11 @@ class AdminServices extends config {
             }else{
                 //if The Location is not exist yet then this will run which mean it will create new location and User Custome LocID
                 $locationID = $this->generateLocationID();
-                $table_incident_location_query = "INSERT INTO `tbl_incident_location`(`locationID`,`location_name`, `latitude`, `longitude`) VALUES (:locationID,:location_name, :latitude, :longitude)";
+                $table_incident_location_query = "INSERT INTO `tbl_incident_location`(`locationID`,`location_name`, `location_purok`, `latitude`, `longitude`) VALUES (:locationID, :location_name, :location_purok, :latitude, :longitude)";
                 $stmt1 = $this->pdo->prepare($table_incident_location_query);
                 $stmt1->bindParam(':locationID', $locationID);
                 $stmt1->bindParam(':location_name', $location_name);
+                $stmt1->bindParam(':location_purok', $location_purok);
                 $stmt1->bindParam(':latitude', $latitude);
                 $stmt1->bindParam(':longitude', $longitude);
                 $stmt1->execute();
@@ -338,7 +360,7 @@ class AdminServices extends config {
 
             $incidentID = $this->generateIncidentID();
 
-            $incident_query = "INSERT INTO `tbl_incident`(`locationID_fk`, `incidentID_fk`, `complaint`, `rescuer_team`, `referred_hospital`, `incident_date`) VALUES (:locationID_fk, :incidentID_fk, :complaint, :rescuer_team, :referred_hospital, :incident_date)";
+            $incident_query = "INSERT INTO `tbl_incident`(`locationID_fk`, `incidentID_fk`, `complaint`, `rescuer_team`, `referred_hospital`, `incident_date`,`incident_time`) VALUES (:locationID_fk, :incidentID_fk, :complaint, :rescuer_team, :referred_hospital, :incident_date, :incident_time)";
             $stmt3 = $this->pdo->prepare($incident_query);
             $stmt3->bindParam(':locationID_fk', $locationID);
             $stmt3->bindParam(':incidentID_fk', $incidentID);
@@ -346,7 +368,7 @@ class AdminServices extends config {
             $stmt3->bindParam(':rescuer_team', $rescuer_team);
             $stmt3->bindParam(':referred_hospital', $referred_hospital);
             $stmt3->bindParam(':incident_date', $incident_date);
-
+            $stmt3->bindParam(':incident_time', $incident_time);
             // Execute the fourth query
             $stmt3->execute();
 
@@ -416,7 +438,8 @@ class AdminServices extends config {
         $complaint, 
         $rescuer_team, 
         $referred_hospital, 
-        $incident_date, 
+        $incident_date,
+        $incident_time, 
         $isVehiclular, 
         $patient_classification, 
         $vehicle_type, 
@@ -487,13 +510,14 @@ class AdminServices extends config {
             }
     
             // Update incident
-            $update_incident_query = "UPDATE `tbl_incident` SET `locationID_fk` = :locationID_fk, `complaint` = :complaint, `rescuer_team` = :rescuer_team, `referred_hospital` = :referred_hospital, `incident_date` = :incident_date WHERE `incidentID_fk` = :incidentID_fk";
+            $update_incident_query = "UPDATE `tbl_incident` SET `locationID_fk` = :locationID_fk, `complaint` = :complaint, `rescuer_team` = :rescuer_team, `referred_hospital` = :referred_hospital, `incident_date` = :incident_date, `incident_time` = :incident_time WHERE `incidentID_fk` = :incidentID_fk";
             $stmt3 = $this->pdo->prepare($update_incident_query);
             $stmt3->bindParam(':locationID_fk', $locationID);
             $stmt3->bindParam(':complaint', $complaint);
             $stmt3->bindParam(':rescuer_team', $rescuer_team);
             $stmt3->bindParam(':referred_hospital', $referred_hospital);
             $stmt3->bindParam(':incident_date', $incident_date);
+            $stmt3->bindParam(':incident_time', $incident_time);
             $stmt3->bindParam(':incidentID_fk', $incidentID_fk);
             $stmt3->execute();
     
@@ -555,14 +579,15 @@ class AdminServices extends config {
     
 
     // UPDATE INCIDENT LOCATION NAME
-    public function updateBrgyLocation($locID, $location_name) {
+    public function updateBrgyLocation($locID, $location_name, $location_purok) {
         try {
             // Begin the transaction
             $this->pdo->beginTransaction();
-                $table_incident_location_query = "UPDATE `tbl_incident_location` SET `location_name`=:location_name WHERE locationID=:locationID";
+                $table_incident_location_query = "UPDATE `tbl_incident_location` SET `location_name`=:location_name, `location_purok`=:location_purok WHERE locationID=:locationID";
                 $stmt1 = $this->pdo->prepare($table_incident_location_query);
                 $stmt1->bindParam(':locationID', $locID);
                 $stmt1->bindParam(':location_name', $location_name);
+                $stmt1->bindParam(':location_purok', $location_purok);
                 $stmt1->execute();
             // Commit the transaction
             $this->pdo->commit();
@@ -702,6 +727,89 @@ class AdminServices extends config {
             echo "Error: " . $e->getMessage();
         }
     }
+
+    public function reportEachMonthThisYear() {
+        try {
+            $query = "SELECT `barangay`, `incident_count`, `incident_types`, `incident_month`, `incident_year` FROM `incident_data_each_month_this_year` WHERE 1 ORDER BY `incident_year` ASC, `incident_month` ASC;";
+            $stmt = $this->pdo->prepare($query); // Prepare the query
+            $stmt->execute(); // Execute the query
+            $locations =  $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch the result
+    
+            return $locations; // Outputs locations as JSON
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+        }
+    }
+    
+
+    public function getAllBaranggayData() {
+        try {
+            $query = "SELECT `barangay_name`, `incident_count` FROM `incident_counts_by_barangay` WHERE 1";
+            $stmt = $this->pdo->prepare($query); // Prepare the query
+            $stmt->execute(); // Execute the query
+            $locations =  $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch the result
+        
+            return $locations;// Outputs locations as JSON
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+        }
+    }
+
+    public function getBaranggayDatabyLocationnName($location_name) {
+        try {
+            $query = "SELECT 
+                        loc.locationID, 
+                        loc.location_name, 
+                        loc.location_purok, 
+                        inc.locationID_fk, 
+                        inc.incidentID_fk, 
+                        inc.incident_date, 
+                        inc.incident_time, 
+                        ti.incidentID, 
+                        ti.isVehiclular, 
+                        ti.type_of_incident, 
+                        ti.description,
+                        COUNT(pi.incidentID_fk) AS patient_count
+                    FROM 
+                        tbl_incident_location AS loc
+                    JOIN 
+                        tbl_incident AS inc 
+                    ON 
+                        loc.locationID = inc.locationID_fk
+                    JOIN 
+                        tbl_type_incident AS ti 
+                    ON 
+                        inc.incidentID_fk = ti.incidentID
+                    LEFT JOIN 
+                        tbl_patient_info AS pi
+                    ON 
+                        inc.incidentID_fk = pi.incidentID_fk
+                    WHERE 
+                        loc.location_name = :location_name
+                    GROUP BY
+                        loc.locationID, 
+                        loc.location_name, 
+                        loc.location_purok, 
+                        inc.locationID_fk, 
+                        inc.incidentID_fk, 
+                        inc.incident_date, 
+                        inc.incident_time, 
+                        ti.incidentID, 
+                        ti.isVehiclular, 
+                        ti.type_of_incident, 
+                        ti.description;
+";    
+            $stmt = $this->pdo->prepare($query); // Prepare the query
+            $stmt->bindParam(':location_name', $location_name);
+            $stmt->execute(); // Execute the query
+            $locations =  $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch the result
+        
+            return $locations;// Outputs locations as JSON
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+        }
+    }
+
 
 
 
