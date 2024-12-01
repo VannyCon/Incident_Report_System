@@ -42,7 +42,7 @@ require_once('../../components/header.php');
                     <?php foreach ($brgyData as $barangay): ?>
                         <tr class="rounded">
                             <td><?php echo htmlspecialchars($barangay['barangay_name']); ?></td>
-                            <td><?php echo $barangay['incident_count']; ?></td>
+                            <td><?php echo $barangay['total_incident_count']; ?></td>
                             <td><a href="baranggay_incident.php?baranggay=<?php echo htmlspecialchars($barangay['barangay_name']); ?>" class="btn btn-primary rounded">Check</a></td>
                         </tr>
                     <?php endforeach; ?>

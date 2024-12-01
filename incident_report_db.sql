@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 01, 2024 at 07:30 AM
+-- Generation Time: Dec 01, 2024 at 07:44 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -24,12 +24,12 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Stand-in structure for view `incident_counts_by_barangay`
+-- Stand-in structure for view `incident_counts_each_barangay`
 -- (See below for the actual view)
 --
-CREATE TABLE `incident_counts_by_barangay` (
+CREATE TABLE `incident_counts_each_barangay` (
 `barangay_name` varchar(25)
-,`incident_count` bigint(21)
+,`total_incident_count` decimal(42,0)
 );
 
 -- --------------------------------------------------------
@@ -320,11 +320,11 @@ CREATE TABLE `total_of_injuries` (
 -- --------------------------------------------------------
 
 --
--- Structure for view `incident_counts_by_barangay`
+-- Structure for view `incident_counts_each_barangay`
 --
-DROP TABLE IF EXISTS `incident_counts_by_barangay`;
+DROP TABLE IF EXISTS `incident_counts_each_barangay`;
 
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `incident_counts_by_barangay`  AS SELECT `barangays`.`barangay_name` AS `barangay_name`, count(`tbl_incident_location`.`location_name`) AS `incident_count` FROM ((select 'Andres Bonifacio' AS `barangay_name` union all select 'Bato' AS `Bato` union all select 'Baviera' AS `Baviera` union all select 'Bulanon' AS `Bulanon` union all select 'Campo Himoga-an' AS `Campo Himoga-an` union all select 'Campo Santiago' AS `Campo Santiago` union all select 'Colonia Divina' AS `Colonia Divina` union all select 'Rafaela Barrera' AS `Rafaela Barrera` union all select 'Fabrica' AS `Fabrica` union all select 'General Luna' AS `General Luna` union all select 'Himoga-an Baybay' AS `Himoga-an Baybay` union all select 'Lopez Jaena' AS `Lopez Jaena` union all select 'Malubon' AS `Malubon` union all select 'Maquiling' AS `Maquiling` union all select 'Molocaboc' AS `Molocaboc` union all select 'Old Sagay' AS `Old Sagay` union all select 'Paraiso' AS `Paraiso` union all select 'Plaridel' AS `Plaridel` union all select 'Poblacion I (Barangay 1)' AS `Poblacion I (Barangay 1)` union all select 'Poblacion II (Barangay 2)' AS `Poblacion II (Barangay 2)` union all select 'Puey' AS `Puey` union all select 'Rizal' AS `Rizal` union all select 'Taba-ao' AS `Taba-ao` union all select 'Tadlong' AS `Tadlong` union all select 'Vito' AS `Vito`) `barangays` left join `tbl_incident_location` on(`barangays`.`barangay_name` = `tbl_incident_location`.`location_name`)) GROUP BY `barangays`.`barangay_name` ;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `incident_counts_each_barangay`  AS SELECT `barangays`.`barangay_name` AS `barangay_name`, ifnull(sum(`incident_counts`.`incident_count`),0) AS `total_incident_count` FROM ((select 'Andres Bonifacio' AS `barangay_name` union all select 'Bato' AS `Bato` union all select 'Baviera' AS `Baviera` union all select 'Bulanon' AS `Bulanon` union all select 'Campo Himoga-an' AS `Campo Himoga-an` union all select 'Campo Santiago' AS `Campo Santiago` union all select 'Colonia Divina' AS `Colonia Divina` union all select 'Rafaela Barrera' AS `Rafaela Barrera` union all select 'Fabrica' AS `Fabrica` union all select 'General Luna' AS `General Luna` union all select 'Himoga-an Baybay' AS `Himoga-an Baybay` union all select 'Lopez Jaena' AS `Lopez Jaena` union all select 'Malubon' AS `Malubon` union all select 'Maquiling' AS `Maquiling` union all select 'Molocaboc' AS `Molocaboc` union all select 'Old Sagay' AS `Old Sagay` union all select 'Paraiso' AS `Paraiso` union all select 'Plaridel' AS `Plaridel` union all select 'Poblacion I (Barangay 1)' AS `Poblacion I (Barangay 1)` union all select 'Poblacion II (Barangay 2)' AS `Poblacion II (Barangay 2)` union all select 'Puey' AS `Puey` union all select 'Rizal' AS `Rizal` union all select 'Taba-ao' AS `Taba-ao` union all select 'Tadlong' AS `Tadlong` union all select 'Vito' AS `Vito`) `barangays` left join (select `l`.`location_name` AS `location_name`,count(`i`.`id`) AS `incident_count` from (`tbl_incident_location` `l` left join `tbl_incident` `i` on(`l`.`locationID` = `i`.`locationID_fk`)) group by `l`.`location_name`) `incident_counts` on(`barangays`.`barangay_name` = `incident_counts`.`location_name`)) GROUP BY `barangays`.`barangay_name` ;
 
 -- --------------------------------------------------------
 

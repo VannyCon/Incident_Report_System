@@ -744,7 +744,7 @@ class AdminServices extends config {
 
     public function getAllBaranggayData() {
         try {
-            $query = "SELECT `barangay_name`, `incident_count` FROM `incident_counts_by_barangay` WHERE 1";
+            $query = "SELECT `barangay_name`, `total_incident_count` FROM `incident_counts_each_barangay` WHERE 1";
             $stmt = $this->pdo->prepare($query); // Prepare the query
             $stmt->execute(); // Execute the query
             $locations =  $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch the result
