@@ -21,7 +21,8 @@
                             <div class="circle-check mb-4" style="margin: 0 auto; width: 100px; height: 100px; border-radius: 50%; background-color: #28a745; display: flex; justify-content: center; align-items: center;">
                                 <i class="fas fa-file" style="font-size: 48px; color: white;"></i>
                             </div>
-                            <h5 class="mb-4">Report for the Month of <?php echo date('F'); ?></h5>
+                            <h5 class="mb-4">Report for the Year of <?php echo date('Y'); ?></h5>
+
                             <!-- Download Button -->
                              <!-- If you want to create Report you will redirect to Report_pdf.php -->
                             <a href="report_pdf.php" class="btn btn-primary w-100">Download</a>
