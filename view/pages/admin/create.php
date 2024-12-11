@@ -20,7 +20,7 @@ $getAllIncidentTypes = $adminService->getAllIncidentTypes();
       <!-- Select Incident Type -->
       <div class="mb-3">
         <label for="incidentType" class="form-label">Select Incident Type</label>
-          <select class="form-select" id="incidentType" name="incident_type" aria-label="Incident Type">
+          <select class="form-select" id="incidentType" name="incident_type" aria-label="Incident Type" required>
               <option value="" selected disabled>Choose an incident type</option>
               <?php foreach ($getAllIncidentTypes as $incident): ?>
                   <option value="<?php echo $incident['value']; ?>"><?php echo $incident['incident_name']; ?></option>
@@ -35,7 +35,7 @@ $getAllIncidentTypes = $adminService->getAllIncidentTypes();
         if(!isset($_GET['locID'])){
           echo " <div class='mb-3'>
                   <label for='barangay' class='form-label'>Baranggay</label>
-                  <select class='form-select' id='barangay' name='location_name' aria-label='Barangay'>
+                  <select class='form-select' id='barangay' name='location_name' aria-label='Barangay' required>
                     <option value='' selected disabled>Choose a Barangay</option>
                     <option value='Bato'>Bato</option>
                     <option value='Bulanon'>Bulanon</option>
@@ -46,7 +46,7 @@ $getAllIncidentTypes = $adminService->getAllIncidentTypes();
 
                 <div class='mb-3'>
                   <label for='purok' class='form-label'>Purok</label>
-                  <select class='form-select' id='purok' name='location_purok' aria-label='Purok'>
+                  <select class='form-select' id='purok' name='location_purok' aria-label='Purok' required>
                     <option value='' selected disabled>Choose a Purok</option>
                   </select>
                 </div>
