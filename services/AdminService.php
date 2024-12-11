@@ -943,8 +943,11 @@ class AdminServices extends config {
         // GET ALL PUROK
         public function getAllPurokJSON() {
             try {
-                // Prepare and execute the SQL query
-                $query = "SELECT `baranggay_name`, `purok_name` FROM `tbl_purok` WHERE 1";
+                // Prepare the SQL query with LEFT JOIN to include all baranggays, even those without a purok
+                $query = "SELECT b.id, b.baranggay_name, p.purok_name 
+                          FROM tbl_baranggay b
+                          LEFT JOIN tbl_purok p ON b.baranggay_name = p.baranggay_name
+                          WHERE 1";
                 $stmt = $this->pdo->prepare($query);
                 $stmt->execute();
                 
@@ -953,27 +956,32 @@ class AdminServices extends config {
         
                 // Initialize an empty array to group purok by baranggay
                 $groupedPurok = [];
-        
+                
                 // Loop through the fetched data and group by baranggay_name
                 foreach ($purokData as $row) {
                     $baranggay = $row['baranggay_name'];
                     $purok = $row['purok_name'];
-        
+                    
                     // If the baranggay name doesn't exist in the array, create an empty array for it
                     if (!isset($groupedPurok[$baranggay])) {
                         $groupedPurok[$baranggay] = [];
                     }
-        
-                    // Append the purok name to the corresponding baranggay
-                    $groupedPurok[$baranggay][] = $purok;
+                    
+                    // If a purok exists, append it; otherwise, append null
+                    if ($purok !== null) {
+                        $groupedPurok[$baranggay][] = $purok;
+                    } else {
+                        $groupedPurok[$baranggay][] = null; // No purok found for this baranggay
+                    }
                 }
-        
+                
                 // Return the data as JSON
                 echo json_encode($groupedPurok, JSON_PRETTY_PRINT);
             } catch (PDOException $e) {
                 echo "Error: " . $e->getMessage();
             }
         }
+        
 
         // This part get all the patient information usiong IncidentID
     public function getAllPurokByID($baranggay_name) {
