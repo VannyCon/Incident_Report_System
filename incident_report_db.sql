@@ -559,7 +559,7 @@ CREATE TABLE `total_of_injuries` (
 --
 DROP TABLE IF EXISTS `incident_counts_each_barangay`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `incident_counts_each_barangay`  AS SELECT `barangays`.`barangay_name` AS `barangay_name`, ifnull(sum(`incident_counts`.`incident_count`),0) AS `total_incident_count` FROM ((select 'Andres Bonifacio' AS `barangay_name` union all select 'Bato' AS `Bato` union all select 'Baviera' AS `Baviera` union all select 'Bulanon' AS `Bulanon` union all select 'Campo Himoga-an' AS `Campo Himoga-an` union all select 'Campo Santiago' AS `Campo Santiago` union all select 'Colonia Divina' AS `Colonia Divina` union all select 'Rafaela Barrera' AS `Rafaela Barrera` union all select 'Fabrica' AS `Fabrica` union all select 'General Luna' AS `General Luna` union all select 'Himoga-an Baybay' AS `Himoga-an Baybay` union all select 'Lopez Jaena' AS `Lopez Jaena` union all select 'Malubon' AS `Malubon` union all select 'Maquiling' AS `Maquiling` union all select 'Molocaboc' AS `Molocaboc` union all select 'Old Sagay' AS `Old Sagay` union all select 'Paraiso' AS `Paraiso` union all select 'Plaridel' AS `Plaridel` union all select 'Poblacion I (Barangay 1)' AS `Poblacion I (Barangay 1)` union all select 'Poblacion II (Barangay 2)' AS `Poblacion II (Barangay 2)` union all select 'Puey' AS `Puey` union all select 'Rizal' AS `Rizal` union all select 'Taba-ao' AS `Taba-ao` union all select 'Tadlong' AS `Tadlong` union all select 'Vito' AS `Vito`) `barangays` left join (select `l`.`location_name` AS `location_name`,count(`i`.`id`) AS `incident_count` from (`tbl_incident_location` `l` left join `tbl_incident` `i` on(`l`.`locationID` = `i`.`locationID_fk`)) group by `l`.`location_name`) `incident_counts` on(`barangays`.`barangay_name` = `incident_counts`.`location_name`)) GROUP BY `barangays`.`barangay_name` ;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `incident_counts_each_barangay`  AS SELECT `barangays`.`barangay_name` AS `barangay_name`, ifnull(sum(`incident_counts`.`incident_count`),0) AS `total_incident_count` FROM ((select 'Andres Bonifacio' AS `barangay_name` union all select 'Bato' AS `Bato` union all select 'Baviera' AS `Baviera` union all select 'Bulanon' AS `Bulanon` union all select 'Campo Himoga-an' AS `Campo Himoga-an` union all select 'Campo Santiago' AS `Campo Santiago` union all select 'Colonia Divina' AS `Colonia Divina` union all select 'Rafaela Barrera' AS `Rafaela Barrera` union all select 'Fabrica' AS `Fabrica` union all select 'General Luna' AS `General Luna` union all select 'Himoga-an Baybay' AS `Himoga-an Baybay` union all select 'Lopez Jaena' AS `Lopez Jaena` union all select 'Malubon' AS `Malubon` union all select 'Maquiling' AS `Maquiling` union all select 'Molocaboc' AS `Molocaboc` union all select 'Old Sagay' AS `Old Sagay` union all select 'Paraiso' AS `Paraiso` union all select 'Plaridel' AS `Plaridel` union all select 'Poblacion I (Barangay 1)' AS `Poblacion I (Barangay 1)` union all select 'Poblacion II (Barangay 2)' AS `Poblacion II (Barangay 2)` union all select 'Puey' AS `Puey` union all select 'Rizal' AS `Rizal` union all select 'Taba-ao' AS `Taba-ao` union all select 'Tadlong' AS `Tadlong` union all select 'Vito' AS `Vito`) `barangays` left join (select `l`.`location_name` AS `location_name`,count(`i`.`id`) AS `incident_count` from (`tbl_incident_location` `l` left join `tbl_incident` `i` on(`l`.`locationID` = `i`.`locationID_fk`)) group by `l`.`location_name`) `incident_counts` on(`barangays`.`barangay_name` = `incident_counts`.`location_name`)) GROUP BY `barangays`.`barangay_name` ;
 
 -- --------------------------------------------------------
 
@@ -568,7 +568,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `incident_count_current_month_per_barangay_with_type`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `incident_count_current_month_per_barangay_with_type`  AS SELECT `l`.`location_name` AS `barangay`, count(`i`.`locationID_fk`) AS `incident_count`, group_concat(`t`.`type_of_incident` separator ', ') AS `incident_types` FROM ((`tbl_incident` `i` join `tbl_incident_location` `l` on(`i`.`locationID_fk` = `l`.`locationID`)) join `tbl_type_incident` `t` on(`i`.`incidentID_fk` = `t`.`incidentID`)) WHERE `l`.`location_name` in ('Andres Bonifacio','Bato','Baviera','Bulanon','Campo Himoga-an','Campo Santiago','Colonia Divina','Rafaela Barrera','Fabrica','General Luna','Himoga-an Baybay','Lopez Jaena','Malubon','Maquiling','Molocaboc','Old Sagay','Paraiso','Plaridel','Poblacion I (Barangay 1)','Poblacion II (Barangay 2)','Puey','Rizal','Taba-ao','Tadlong','Vito') AND month(`i`.`incident_date`) = month(curdate()) AND year(`i`.`incident_date`) = year(curdate()) GROUP BY `l`.`location_name` ;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `incident_count_current_month_per_barangay_with_type`  AS SELECT `l`.`location_name` AS `barangay`, count(`i`.`locationID_fk`) AS `incident_count`, group_concat(`t`.`type_of_incident` separator ', ') AS `incident_types` FROM ((`tbl_incident` `i` join `tbl_incident_location` `l` on(`i`.`locationID_fk` = `l`.`locationID`)) join `tbl_type_incident` `t` on(`i`.`incidentID_fk` = `t`.`incidentID`)) WHERE `l`.`location_name` in ('Andres Bonifacio','Bato','Baviera','Bulanon','Campo Himoga-an','Campo Santiago','Colonia Divina','Rafaela Barrera','Fabrica','General Luna','Himoga-an Baybay','Lopez Jaena','Malubon','Maquiling','Molocaboc','Old Sagay','Paraiso','Plaridel','Poblacion I (Barangay 1)','Poblacion II (Barangay 2)','Puey','Rizal','Taba-ao','Tadlong','Vito') AND month(`i`.`incident_date`) = month(curdate()) AND year(`i`.`incident_date`) = year(curdate()) GROUP BY `l`.`location_name` ;
 
 -- --------------------------------------------------------
 
@@ -577,7 +577,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `incident_count_per_barangay_with_type`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `incident_count_per_barangay_with_type`  AS SELECT `l`.`location_name` AS `barangay`, count(`i`.`locationID_fk`) AS `incident_count`, group_concat(`t`.`type_of_incident` separator ', ') AS `incident_types` FROM ((`tbl_incident` `i` join `tbl_incident_location` `l` on(`i`.`locationID_fk` = `l`.`locationID`)) join `tbl_type_incident` `t` on(`i`.`incidentID_fk` = `t`.`incidentID`)) WHERE `l`.`location_name` in ('Andres Bonifacio','Bato','Baviera','Bulanon','Campo Himoga-an','Campo Santiago','Colonia Divina','Rafaela Barrera','Fabrica','General Luna','Himoga-an Baybay','Lopez Jaena','Malubon','Maquiling','Molocaboc','Old Sagay','Paraiso','Plaridel','Poblacion I (Barangay 1)','Poblacion II (Barangay 2)','Puey','Rizal','Taba-ao','Tadlong','Vito') GROUP BY `l`.`location_name` ;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `incident_count_per_barangay_with_type`  AS SELECT `l`.`location_name` AS `barangay`, count(`i`.`locationID_fk`) AS `incident_count`, group_concat(`t`.`type_of_incident` separator ', ') AS `incident_types` FROM ((`tbl_incident` `i` join `tbl_incident_location` `l` on(`i`.`locationID_fk` = `l`.`locationID`)) join `tbl_type_incident` `t` on(`i`.`incidentID_fk` = `t`.`incidentID`)) WHERE `l`.`location_name` in ('Andres Bonifacio','Bato','Baviera','Bulanon','Campo Himoga-an','Campo Santiago','Colonia Divina','Rafaela Barrera','Fabrica','General Luna','Himoga-an Baybay','Lopez Jaena','Malubon','Maquiling','Molocaboc','Old Sagay','Paraiso','Plaridel','Poblacion I (Barangay 1)','Poblacion II (Barangay 2)','Puey','Rizal','Taba-ao','Tadlong','Vito') GROUP BY `l`.`location_name` ;
 
 -- --------------------------------------------------------
 
@@ -586,7 +586,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `incident_data_each_month_this_year`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `incident_data_each_month_this_year`  AS SELECT `l`.`location_name` AS `barangay`, count(`i`.`locationID_fk`) AS `incident_count`, group_concat(distinct `t`.`type_of_incident` separator ', ') AS `incident_types`, month(`i`.`incident_date`) AS `incident_month`, year(`i`.`incident_date`) AS `incident_year` FROM ((`tbl_incident` `i` join `tbl_incident_location` `l` on(`i`.`locationID_fk` = `l`.`locationID`)) join `tbl_type_incident` `t` on(`i`.`incidentID_fk` = `t`.`incidentID`)) WHERE `l`.`location_name` in ('Andres Bonifacio','Bato','Baviera','Bulanon','Campo Himoga-an','Campo Santiago','Colonia Divina','Rafaela Barrera','Fabrica','General Luna','Himoga-an Baybay','Lopez Jaena','Malubon','Maquiling','Molocaboc','Old Sagay','Paraiso','Plaridel','Poblacion I (Barangay 1)','Poblacion II (Barangay 2)','Puey','Rizal','Taba-ao','Tadlong','Vito') GROUP BY `l`.`location_name`, month(`i`.`incident_date`), year(`i`.`incident_date`) ;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `incident_data_each_month_this_year`  AS SELECT `l`.`location_name` AS `barangay`, count(`i`.`locationID_fk`) AS `incident_count`, group_concat(distinct `t`.`type_of_incident` separator ', ') AS `incident_types`, month(`i`.`incident_date`) AS `incident_month`, year(`i`.`incident_date`) AS `incident_year` FROM ((`tbl_incident` `i` join `tbl_incident_location` `l` on(`i`.`locationID_fk` = `l`.`locationID`)) join `tbl_type_incident` `t` on(`i`.`incidentID_fk` = `t`.`incidentID`)) WHERE `l`.`location_name` in ('Andres Bonifacio','Bato','Baviera','Bulanon','Campo Himoga-an','Campo Santiago','Colonia Divina','Rafaela Barrera','Fabrica','General Luna','Himoga-an Baybay','Lopez Jaena','Malubon','Maquiling','Molocaboc','Old Sagay','Paraiso','Plaridel','Poblacion I (Barangay 1)','Poblacion II (Barangay 2)','Puey','Rizal','Taba-ao','Tadlong','Vito') GROUP BY `l`.`location_name`, month(`i`.`incident_date`), year(`i`.`incident_date`) ;
 
 -- --------------------------------------------------------
 
@@ -595,7 +595,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `map_incident_cases`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `map_incident_cases`  AS SELECT `i`.`locationID_fk` AS `locationID_fk`, count(`i`.`locationID_fk`) AS `location_count`, `l`.`latitude` AS `latitude`, `l`.`longitude` AS `longitude` FROM (`tbl_incident` `i` join `tbl_incident_location` `l` on(`i`.`locationID_fk` = `l`.`locationID`)) GROUP BY `i`.`locationID_fk`, `l`.`latitude`, `l`.`longitude` ;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `map_incident_cases`  AS SELECT `i`.`locationID_fk` AS `locationID_fk`, count(`i`.`locationID_fk`) AS `location_count`, `l`.`latitude` AS `latitude`, `l`.`longitude` AS `longitude` FROM (`tbl_incident` `i` join `tbl_incident_location` `l` on(`i`.`locationID_fk` = `l`.`locationID`)) GROUP BY `i`.`locationID_fk`, `l`.`latitude`, `l`.`longitude` ;
 
 -- --------------------------------------------------------
 
@@ -604,7 +604,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `month_analytics`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `month_analytics`  AS SELECT monthname(`tbl_incident`.`incident_date`) AS `month_name`, count(0) AS `incident_count` FROM `tbl_incident` GROUP BY month(`tbl_incident`.`incident_date`) ORDER BY month(`tbl_incident`.`incident_date`) ASC ;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `month_analytics`  AS SELECT monthname(`tbl_incident`.`incident_date`) AS `month_name`, count(0) AS `incident_count` FROM `tbl_incident` GROUP BY month(`tbl_incident`.`incident_date`) ORDER BY month(`tbl_incident`.`incident_date`) ASC ;
 
 -- --------------------------------------------------------
 
@@ -613,7 +613,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `past_year_analytics`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `past_year_analytics`  AS SELECT year(`tbl_incident`.`incident_date`) AS `incident_year`, count(0) AS `incident_count` FROM `tbl_incident` WHERE `tbl_incident`.`incident_date` >= curdate() - interval 5 year GROUP BY year(`tbl_incident`.`incident_date`) ORDER BY year(`tbl_incident`.`incident_date`) ASC ;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `past_year_analytics`  AS SELECT year(`tbl_incident`.`incident_date`) AS `incident_year`, count(0) AS `incident_count` FROM `tbl_incident` WHERE `tbl_incident`.`incident_date` >= curdate() - interval 5 year GROUP BY year(`tbl_incident`.`incident_date`) ORDER BY year(`tbl_incident`.`incident_date`) ASC ;
 
 -- --------------------------------------------------------
 
@@ -622,7 +622,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `top_three_incidents`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `top_three_incidents`  AS SELECT `tbl_type_incident`.`type_of_incident` AS `type_of_incident`, count(0) AS `total_cases` FROM `tbl_type_incident` GROUP BY `tbl_type_incident`.`type_of_incident` ORDER BY count(0) DESC LIMIT 0, 3 ;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `top_three_incidents`  AS SELECT `tbl_type_incident`.`type_of_incident` AS `type_of_incident`, count(0) AS `total_cases` FROM `tbl_type_incident` GROUP BY `tbl_type_incident`.`type_of_incident` ORDER BY count(0) DESC LIMIT 0, 3 ;
 
 -- --------------------------------------------------------
 
@@ -631,7 +631,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `total_of_injuries`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `total_of_injuries`  AS SELECT count(case when `tbl_patient_info`.`statusID` = 'SID-001' then 1 end) AS `minor`, count(case when `tbl_patient_info`.`statusID` = 'SID-002' then 1 end) AS `major`, count(case when `tbl_patient_info`.`statusID` = 'SID-003' then 1 end) AS `fatal`, count(case when `tbl_patient_info`.`statusID` = 'SID-004' then 1 end) AS `died` FROM `tbl_patient_info` ;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `total_of_injuries`  AS SELECT count(case when `tbl_patient_info`.`statusID` = 'SID-001' then 1 end) AS `minor`, count(case when `tbl_patient_info`.`statusID` = 'SID-002' then 1 end) AS `major`, count(case when `tbl_patient_info`.`statusID` = 'SID-003' then 1 end) AS `fatal`, count(case when `tbl_patient_info`.`statusID` = 'SID-004' then 1 end) AS `died` FROM `tbl_patient_info` ;
 
 --
 -- Indexes for dumped tables

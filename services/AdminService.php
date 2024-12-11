@@ -1049,13 +1049,13 @@ class AdminServices extends config {
 
 
 // CREATE INCIDENT TYPES
-public function createIncidentTypes($value, $incident_name) {
+public function createIncidentTypes($incident_name) {
     try {
         // Begin the transaction
         $this->pdo->beginTransaction();
 
         // Prepare the query for inserting incident types
-        $query = "INSERT INTO `tbl_crud_incident_type` (`value`, `incident_name`) VALUES (:value, :incident_name)";
+        $query = "INSERT INTO `tbl_crud_incident_type` (`value`, `incident_name`) VALUES (:incident_name, :incident_name)";
         $stmt = $this->pdo->prepare($query);
 
         // Bind the parameters
@@ -1096,14 +1096,13 @@ public function getAllIncidentTypes() {
 }
 
 // UPDATE INCIDENT TYPE
-public function updateIncidentType($id, $value, $incident_name) {
+public function updateIncidentType($id, $incident_name) {
     try {
         // Begin the transaction
         $this->pdo->beginTransaction();
 
-        $query = "UPDATE `tbl_crud_incident_type` SET `value`=:value, `incident_name`=:incident_name WHERE `id`= :id";
+        $query = "UPDATE `tbl_crud_incident_type` SET  `incident_name`=:incident_name WHERE `id`= :id";
         $stmt = $this->pdo->prepare($query);
-        $stmt->bindParam(':value', $value);
         $stmt->bindParam(':incident_name', $incident_name);
         $stmt->bindParam(':id', $id);
         $stmt->execute();
