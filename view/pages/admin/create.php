@@ -1,7 +1,7 @@
 <?php
 $title = 'Create';
 require_once('../../../controller/AdminController.php');
-
+$getAllIncidentTypes = $adminService->getAllIncidentTypes();
 ?>
 
 
@@ -20,17 +20,15 @@ require_once('../../../controller/AdminController.php');
       <!-- Select Incident Type -->
       <div class="mb-3">
         <label for="incidentType" class="form-label">Select Incident Type</label>
-        <select class="form-select" id="incidentType" name="incident_type" aria-label="Incident Type">
-          <option value="" selected disabled>Choose an incident type</option>
-          <option value="isVehiclular">Vehicular Incident</option>
-          <option value="Drowning">Drowning</option>
-          <option value="Suicide">Suicide</option>
-          <option value="Shooting Incident">Shooting Incident</option>
-          <option value="Medical">Medical</option>
-          <option value="Trauma">Trauma</option>
-          <option value="Walk In">Walk In</option>
-        </select>
+          <select class="form-select" id="incidentType" name="incident_type" aria-label="Incident Type">
+              <option value="" selected disabled>Choose an incident type</option>
+              <?php foreach ($getAllIncidentTypes as $incident): ?>
+                  <option value="<?php echo $incident['value']; ?>"><?php echo $incident['incident_name']; ?></option>
+              <?php endforeach; ?>
+          </select>
       </div>
+
+      
       <?php 
 
       // if Incident Location is already exist you wont see this Navigation else if New location then this will show

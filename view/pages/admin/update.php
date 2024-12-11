@@ -1,7 +1,7 @@
 <?php
 
 require_once('../../../controller/AdminController.php');
-
+$getAllIncidentTypes = $adminService->getAllIncidentTypes();
 $title = 'Update';
 
 // Assuming IncidentID is passed as a GET parameter
@@ -58,15 +58,15 @@ if (isset($incidentData['patients'])) {
             <label for="incidentType" class="form-label">Select Incident Type</label>
             <select class="form-select" id="incidentType" name="incident_type" aria-label="Incident Type">
                 <option value="" <?php echo (empty($incidentData['type_of_incident'])) ? 'selected' : ''; ?> disabled>Choose an incident type</option>
-                <option value="isVehiclular" <?php echo (isset($incidentData['type_of_incident']) && $incidentData['type_of_incident'] == 'isVehiclular') ? 'selected' : ''; ?>>Vehicular Incident</option>
-                <option value="Drowning" <?php echo (isset($incidentData['type_of_incident']) && $incidentData['type_of_incident'] == 'Drowning') ? 'selected' : ''; ?>>Drowning</option>
-                <option value="Suicide" <?php echo (isset($incidentData['type_of_incident']) && $incidentData['type_of_incident'] == 'Suicide') ? 'selected' : ''; ?>>Suicide</option>
-                <option value="Shooting Incident" <?php echo (isset($incidentData['type_of_incident']) && $incidentData['type_of_incident'] == 'Shooting Incident') ? 'selected' : ''; ?>>Shooting Incident</option>
-                <option value="Medical" <?php echo (isset($incidentData['type_of_incident']) && $incidentData['type_of_incident'] == 'Medical') ? 'selected' : ''; ?>>Medical</option>
-                <option value="Trauma" <?php echo (isset($incidentData['type_of_incident']) && $incidentData['type_of_incident'] == 'Trauma') ? 'selected' : ''; ?>>Trauma</option>
-                <option value="Walk In" <?php echo (isset($incidentData['type_of_incident']) && $incidentData['type_of_incident'] == 'Walk In') ? 'selected' : ''; ?>>Walk In</option>
+                <?php foreach ($getAllIncidentTypes as $incident): ?>
+                    <option value="<?php echo $incident['value']; ?>" 
+                        <?php echo (isset($incidentData['type_of_incident']) && $incidentData['type_of_incident'] == $incident['value']) ? 'selected' : ''; ?>>
+                        <?php echo $incident['incident_name']; ?>
+                    </option>
+                <?php endforeach; ?>
             </select>
         </div>
+
 
         <!-- <input type="text" name="lat" id="" value="<?php echo $_GET['lat']?>">
         <input type="text" name="long" id="" value="<?php echo $_GET['long']?>"> -->

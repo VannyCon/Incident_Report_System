@@ -45,7 +45,10 @@
                                     <a class='nav-link ms-3' href='baranggay.php'>Baranggay</a>
                                 </li>
                                 <li class='nav-item'>
-                                    <a class='nav-link ms-3' href='baranggay_data.php'>Incident</a>
+                                    <a class='nav-link ms-3' href='incident.php'>Incident</a>
+                                </li>
+                                <li class='nav-item'>
+                                    <a class='nav-link ms-3' href='baranggay_data.php'>Datas</a>
                                 </li>
                                 <li class='nav-item'>
                                     <a class='nav-link ms-3' href='report.php'>Report</a>

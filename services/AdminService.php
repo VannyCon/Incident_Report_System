@@ -1047,6 +1047,109 @@ class AdminServices extends config {
         }
     }
 
+
+// CREATE INCIDENT TYPES
+public function createIncidentTypes($value, $incident_name) {
+    try {
+        // Begin the transaction
+        $this->pdo->beginTransaction();
+
+        // Prepare the query for inserting incident types
+        $query = "INSERT INTO `tbl_crud_incident_type` (`value`, `incident_name`) VALUES (:value, :incident_name)";
+        $stmt = $this->pdo->prepare($query);
+
+        // Bind the parameters
+        $stmt->bindParam(':value', $value);
+        $stmt->bindParam(':incident_name', $incident_name);
+
+        // Execute the insert statement
+        $stmt->execute();
+
+        // Commit the transaction
+        $this->pdo->commit();
+
+        // Return success
+        return true;
+
+    } catch (PDOException $e) {
+        // Rollback the transaction in case of error
+        $this->pdo->rollBack();
+
+        // Return the error message
+        return "Error: " . $e->getMessage();
+    }
+}
+
+
+// GET ALL INCIDENT TYPES
+public function getAllIncidentTypes() {
+    try {
+        $query = "SELECT `id`, `value`, `incident_name` FROM `tbl_crud_incident_type` WHERE 1;";
+        $stmt = $this->pdo->prepare($query); // Prepare the query
+        $stmt->execute(); // Execute the query
+        $incident_types =  $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch the result
+    
+        return $incident_types; // Outputs incident types as JSON
+    } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
+    }
+}
+
+// UPDATE INCIDENT TYPE
+public function updateIncidentType($id, $value, $incident_name) {
+    try {
+        // Begin the transaction
+        $this->pdo->beginTransaction();
+
+        $query = "UPDATE `tbl_crud_incident_type` SET `value`=:value, `incident_name`=:incident_name WHERE `id`= :id";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->bindParam(':value', $value);
+        $stmt->bindParam(':incident_name', $incident_name);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+
+        // Commit the transaction
+        $this->pdo->commit();
+
+        // Return success
+        return true;
+
+    } catch (PDOException $e) {
+        // Rollback the transaction in case of error
+        $this->pdo->rollBack();
+
+        // Return the error message
+        return "Error: " . $e->getMessage();
+    }
+}
+
+// DELETE INCIDENT TYPE
+public function deleteIncidentType($id) {
+    try {
+        // Begin the transaction
+        $this->pdo->beginTransaction();
+
+        // Delete from tbl_crud_incident_type
+        $delete_query = "DELETE FROM `tbl_crud_incident_type` WHERE `id` = :id";
+        $stmt = $this->pdo->prepare($delete_query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+
+        // Commit the transaction
+        $this->pdo->commit();
+
+        return true;
+
+    } catch (PDOException $e) {
+        // Rollback the transaction in case of error
+        $this->pdo->rollBack();
+
+        // Handle any errors
+        echo "Error: " . $e->getMessage();
+        return false;
+    }
+}
+
 }
 
 

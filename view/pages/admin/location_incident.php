@@ -274,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
         barangaySelect.value = locationName;
 
         // Fetch the JSON file for barangays and puroks
-        fetch('barangay_purok.json')
+        fetch('get_purok.php')
             .then(response => response.json())
             .then(data => {
                 // Populate Barangay dropdown
