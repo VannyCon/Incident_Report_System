@@ -810,8 +810,242 @@ class AdminServices extends config {
         }
     }
 
+    // CREATE BARANGGAY
+    public function createBaranggay($baranggay_name) {
+        try {
+            // Begin the transaction
+            $this->pdo->beginTransaction();
+    
+            // Prepare the query for inserting the barangay
+            $table_incident_location_query = "INSERT INTO `tbl_baranggay`(`baranggay_name`) VALUES (:baranggay_name)";
+            $stmt1 = $this->pdo->prepare($table_incident_location_query);
+            $stmt1->bindParam(':baranggay_name', $baranggay_name);
+            $stmt1->execute();
+    
+            // Commit the transaction
+            $this->pdo->commit();
+    
+            // Return success
+            return true;
+    
+        } catch (PDOException $e) {
+            // Rollback the transaction in case of error
+            $this->pdo->rollBack();
+    
+            // Return the error message
+            return "Error: " . $e->getMessage();
+        }
+    }
+    
 
+    public function getAllBaranggay() {
+        try {
+            $query = "SELECT `id`, `baranggay_name` FROM `tbl_baranggay` WHERE 1;
+                        ";
+            $stmt = $this->pdo->prepare($query); // Prepare the query
+            $stmt->execute(); // Execute the query
+            $brgy =  $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch the result
+        
+            return $brgy; // Outputs brgy as JSON
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+        }
+    }
 
+    // UPDATE INCIDENT LOCATION NAME
+    public function updateBaranggay($id, $baranggay_name) {
+        try {
+            // Begin the transaction
+            $this->pdo->beginTransaction();
+                $table_incident_location_query = "UPDATE `tbl_baranggay` SET `baranggay_name`=:baranggay_name WHERE `id`= :id ";
+                $stmt1 = $this->pdo->prepare($table_incident_location_query);
+                $stmt1->bindParam(':baranggay_name', $baranggay_name);
+                $stmt1->bindParam(':id', $id);
+                $stmt1->execute();
+            // Commit the transaction
+            $this->pdo->commit();
+            // Return success
+            return true;
+        } catch (PDOException $e) {
+            // Rollback the transaction in case of error
+            $this->pdo->rollBack();
+            
+            return "Error: " . $e->getMessage();
+        }
+    }
+    //DELETE INCIDENT
+    public function deleteBaranggay($id) {
+        try {
+
+    
+            // Begin the transaction
+            $this->pdo->beginTransaction();
+            // Delete from tbl_incident first
+            $delete_vehicular_incident_query = "DELETE FROM `tbl_baranggay` WHERE id = :id";
+            $stmt1 = $this->pdo->prepare($delete_vehicular_incident_query);
+            $stmt1->bindParam(':id', $id);
+            $stmt1->execute();
+    
+            // Commit the transaction
+            $this->pdo->commit();
+            
+            return true;
+        } catch (PDOException $e) {
+            // Roll back the transaction on error
+            $this->pdo->rollBack();
+            // Handle any errors
+            echo "Error: " . $e->getMessage();
+            return false;
+        }
+    }
+    
+    // CREATE PUROK
+    public function createPurok($baranggay_name, $purok_name) {
+        try {
+            // Begin the transaction
+            $this->pdo->beginTransaction();
+
+            // Prepare the query for inserting the purok
+            $table_purok_query = "INSERT INTO `tbl_purok`(`baranggay_name`, `purok_name`) VALUES (:baranggay_name, :purok_name)";
+            $stmt1 = $this->pdo->prepare($table_purok_query);
+            $stmt1->bindParam(':baranggay_name', $baranggay_name);
+            $stmt1->bindParam(':purok_name', $purok_name);
+            $stmt1->execute();
+
+            // Commit the transaction
+            $this->pdo->commit();
+
+            // Return success
+            return true;
+
+        } catch (PDOException $e) {
+            // Rollback the transaction in case of error
+            $this->pdo->rollBack();
+
+            // Return the error message
+            return "Error: " . $e->getMessage();
+        }
+    }
+
+    // GET ALL PUROK
+    public function getAllPurok() {
+        try {
+            $query = "SELECT `id`, `baranggay_name`, `purok_name` FROM `tbl_purok` WHERE 1";
+            $stmt = $this->pdo->prepare($query); // Prepare the query
+            $stmt->execute(); // Execute the query
+            $purok =  $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch the result
+
+            return $purok; // Return the data
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+        }
+    }
+        // GET ALL PUROK
+        public function getAllPurokJSON() {
+            try {
+                // Prepare and execute the SQL query
+                $query = "SELECT `baranggay_name`, `purok_name` FROM `tbl_purok` WHERE 1";
+                $stmt = $this->pdo->prepare($query);
+                $stmt->execute();
+                
+                // Fetch the result as an associative array
+                $purokData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+                // Initialize an empty array to group purok by baranggay
+                $groupedPurok = [];
+        
+                // Loop through the fetched data and group by baranggay_name
+                foreach ($purokData as $row) {
+                    $baranggay = $row['baranggay_name'];
+                    $purok = $row['purok_name'];
+        
+                    // If the baranggay name doesn't exist in the array, create an empty array for it
+                    if (!isset($groupedPurok[$baranggay])) {
+                        $groupedPurok[$baranggay] = [];
+                    }
+        
+                    // Append the purok name to the corresponding baranggay
+                    $groupedPurok[$baranggay][] = $purok;
+                }
+        
+                // Return the data as JSON
+                echo json_encode($groupedPurok, JSON_PRETTY_PRINT);
+            } catch (PDOException $e) {
+                echo "Error: " . $e->getMessage();
+            }
+        }
+
+        // This part get all the patient information usiong IncidentID
+    public function getAllPurokByID($baranggay_name) {
+        try {
+            $query = "SELECT `id`, `purok_name` FROM `tbl_purok` WHERE `baranggay_name` =  :baranggay_name";
+    
+            $stmt = $this->pdo->prepare($query); // Prepare the query
+            $stmt->bindParam(':baranggay_name', $baranggay_name);  // Bind the value
+            $stmt->execute(); // Execute the query
+            
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all results
+            return $results; // Return all matching records
+    
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            return []; // Return an empty array on error
+        }
+    }
+    
+
+    // UPDATE PUROK
+    public function updatePurok($id, $purok_name) {
+        try {
+            // Begin the transaction
+            $this->pdo->beginTransaction();
+            
+            $update_purok_query = "UPDATE `tbl_purok` SET `purok_name`=:purok_name WHERE `id`= :id";
+            $stmt1 = $this->pdo->prepare($update_purok_query);
+            $stmt1->bindParam(':purok_name', $purok_name);
+            $stmt1->bindParam(':id', $id);
+            $stmt1->execute();
+
+            // Commit the transaction
+            $this->pdo->commit();
+
+            return true;
+
+        } catch (PDOException $e) {
+            // Rollback the transaction in case of error
+            $this->pdo->rollBack();
+
+            // Return the error message
+            return "Error: " . $e->getMessage();
+        }
+    }
+
+    // DELETE PUROK
+    public function deletePurok($id) {
+        try {
+            // Begin the transaction
+            $this->pdo->beginTransaction();
+
+            // Delete from tbl_purok
+            $delete_purok_query = "DELETE FROM `tbl_purok` WHERE id = :id";
+            $stmt1 = $this->pdo->prepare($delete_purok_query);
+            $stmt1->bindParam(':id', $id);
+            $stmt1->execute();
+
+            // Commit the transaction
+            $this->pdo->commit();
+
+            return true;
+
+        } catch (PDOException $e) {
+            // Roll back the transaction on error
+            $this->pdo->rollBack();
+
+            // Handle any errors
+            echo "Error: " . $e->getMessage();
+            return false;
+        }
+    }
 
 }
 

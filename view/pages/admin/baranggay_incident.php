@@ -32,7 +32,7 @@ require_once('../../components/header.php');
 </style>
 
 <div class="container-fluid mt-2">
-    <a href="baranggay.php" class="btn btn-outline-danger">Back</a>
+    <a href="baranggay_data.php" class="btn btn-outline-danger">Back</a>
     <h4>Barangay <?php echo $_GET['baranggay']?> Data</h4>
     <div class="card p-3">
         <table class="table table-bordered rounded">

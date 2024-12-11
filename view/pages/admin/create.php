@@ -1,6 +1,9 @@
 <?php
 $title = 'Create';
-require_once('../../../controller/AdminController.php'); ?>
+require_once('../../../controller/AdminController.php');
+
+?>
+
 
 <?php require_once('../../components/header.php')?>
 
@@ -192,7 +195,7 @@ require_once('../../../controller/AdminController.php'); ?>
 
 
     // Fetch the JSON file
-      fetch('barangay_purok.json')
+      fetch('get_purok.php')
         .then(response => response.json())
         .then(data => {
           // Populate the barangay dropdown
